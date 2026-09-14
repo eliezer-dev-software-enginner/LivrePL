@@ -152,3 +152,33 @@ Documentacao detalhada de cada etapa esta em `docs/`:
 - `interpretador-advpl-03-interpretador.md` - etapa 3
 - `interpretador-advpl-04-docase-sequence-blocos-classes.md` - etapa 4
 - `interpretador-advpl-04b-userexception-throw.md` - adendo: `UserException`/`Throw` no BEGIN SEQUENCE
+
+## FAQ
+
+**Pra quem e recomendado?**
+Para estudantes e analistas de sistemas que querem testar trechos de codigo AdvPL rapidamente, sem depender de um ambiente Protheus completo - nem sempre acessivel fora do trabalho. Ideal para estudar a sintaxe da linguagem, treinar logica de programacao em AdvPL, ou rodar scripts isolados (algoritmos, manipulacao de string/array, OOP basico). Nao substitui o Protheus para nada que dependa de banco de dados, dicionario de dados (SX3) ou MVC.
+
+**Infringe os termos de uso do Protheus?**
+Nao. Este projeto nao usa, nao distribui e nao faz engenharia reversa de nenhum binario da TOTVS (AppServer, compilador, etc.) - e um interpretador escrito do zero em Python que reconhece a *sintaxe* da linguagem AdvPL, sem nenhum codigo proprietario da TOTVS envolvido. Ele nao tem qualquer pretensao comercial, e nao recria o framework Protheus (SX3, MVC, REST, licenciamento) - so a linguagem "pura". Ainda assim, isto nao e uma opiniao juridica; se voce pretende usar isso em contexto corporativo, vale validar com sua empresa.
+
+**O que e AST?**
+AST (*Abstract Syntax Tree*, ou Arvore Sintatica Abstrata) e a representacao estruturada do codigo depois que ele passa pela analise gramatical - cada lacos, condicional, operacao e chamada de funcao vira um "no" em uma arvore, em vez de continuar sendo texto solto. E essa arvore que o interpretador percorre para executar o programa (por isso o termo *tree-walking interpreter*). Rode `python main.py --ast arquivo.prw` para ver a AST de um script seu.
+
+**Meu codigo .prw real do trabalho roda aqui?**
+So se ele for "AdvPL puro" - sem `DBUseArea`, sem classes do framework (`FWMBrowse`, `ModelDef`), sem `WSRESTFUL`, sem Pontos de Entrada. Um `.prw` que ja depende do dicionario de dados (SX3) ou de banco nao vai rodar, porque esse ecossistema nao foi (e nao esta previsto para ser) recriado aqui - ver secao "Limitacoes".
+
+**Por que Python e nao outra linguagem?**
+Velocidade de desenvolvimento do prototipo - parser e interpretador tree-walking em Python sao rapidos de escrever e depurar, e nao ha restricao de performance critica pro objetivo do projeto (rodar scripts pequenos localmente, nao processar carga de producao).
+
+**O projeto vai crescer pra suportar banco de dados/MVC no futuro?**
+Nao esta no roadmap. Isso praticamente significaria reimplementar o Protheus inteiro (SX3, DBAccess, MVC, REST), o que foge do objetivo original do projeto - rodar a linguagem "pura" localmente, sem dependencia de infraestrutura.
+
+**Posso contribuir?**
+Sim. Abra uma issue ou PR - principalmente ideias de exemplos `.prw`, funcoes nativas faltando, ou correcoes de comportamento que divirjam do AdvPL real.
+
+## Como foi construido
+
+O projeto foi idealizado e conduzido por **Eliezer Dev** ([GitHub](https://github.com/eliezer-dev-software-enginner)), que definiu o escopo, validou cada etapa e decidiu as proximas construcoes da linguagem a implementar.
+
+- **Claude Code (modelo Claude Sonnet 5, esforco Medium)** foi usado para o levantamento de requisitos e para desenhar a arquitetura do interpretador (lexer -> parser/AST -> tree-walking interpreter) em conversa iterativa, etapa por etapa. Tambem gerou toda a documentacao tecnica em Markdown presente em `docs/` - incluindo o escopo inicial (v1), o design de cada etapa (lexer, parser, interpretador, OOP/excecoes) e os trechos de codigo Python correspondentes, sempre testando cada peca antes de documentar a saida real.
+- **OpenCode** foi usado para traduzir os trechos de codigo Python presentes nos documentos Markdown de `docs/` nas implementacoes de fato do projeto (`lexer.py`, `parser.py`, `interpreter.py`, etc.), integrando tudo em uma base de codigo coesa e executavel.
