@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+dist/
+build/
+
+# Testes locais
+test_*.py
+*.prw.test
+
+# IDEs / editores
+.vscode/
+.idea/
+*.swp
