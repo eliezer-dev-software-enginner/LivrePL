@@ -19,7 +19,7 @@ Um interpretador tree-walking que executa scripts `.prw` de AdvPL diretamente no
 - **OOP**: CLASS/DATA/METHOD, heranca simples (FROM), SELF, ::attr, obj:Metodo()
 - **Code blocks**: `{|x,y| x+y}` com closure de leitura + Eval()
 - **Excecoes**: `UserException(cMsg)` cria um objeto `ERROR` com `:Description` e lanca; `Throw(valor)` lanca qualquer valor/objeto (inclusive classes de excecao do proprio usuario)
-- **23 funcoes nativas**: Len, Str, AllTrim, Upper, Lower, SubStr, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, Round, Int, Abs, Max, Min, Eval, UserException, Throw
+- **24 funcoes nativas**: Len, Str, CValToChar, AllTrim, Upper, Lower, SubStr, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, Round, Int, Abs, Max, Min, Eval, UserException, Throw
 - **Preprocessador basico**: `#define`, `#include` (no-op)
 
 ## Como testar
@@ -46,6 +46,27 @@ python main.py --ast exemplos/todas-etapas.prw
 ```bash
 python main.py arquivo.prw NOMEFUNC
 ```
+
+### Testar um User Function
+
+Scripts AdvPL costumam declarar o ponto de entrada como `User Function`, nao como `Function Main()`. O interpretador aceita as duas formas — para executar um `User Function`, passe o nome da funcao como entry point:
+
+```bash
+# ola.prw:
+User Function ola()
+    Local cNome := "Dev"
+    ? cNome
+Return(Nil)
+
+python main.py ola.prw ola
+```
+
+Saida:
+```
+Dev
+```
+
+Se o script so tiver `User Function` (sem `Function Main()`), executar sem passar o nome gera o erro `Funcao de entrada 'MAIN' nao encontrada` — basta passar o nome da funcao.
 
 ### Rodar o modulo interpreter diretamente
 
@@ -152,6 +173,10 @@ Documentacao detalhada de cada etapa esta em `docs/`:
 - `interpretador-advpl-03-interpretador.md` - etapa 3
 - `interpretador-advpl-04-docase-sequence-blocos-classes.md` - etapa 4
 - `interpretador-advpl-04b-userexception-throw.md` - adendo: `UserException`/`Throw` no BEGIN SEQUENCE
+- `interpretador-advpl-04c-user-function.md` - correcao: `USER FUNCTION`
+- `interpretador-advpl-04d-cvaltochar.md` - correcao: `CValToChar`
+- `CONTEXT.md` - contexto do projeto e rotina de trabalho
+- `DECISIONS.md` - registro de modificacoes
 
 ## FAQ
 

@@ -55,6 +55,7 @@ class TokenType(Enum):
     METHOD = auto()
     CONSTRUCTOR = auto()
     FROM = auto()
+    USER = auto()
 
     # Operadores
     ASSIGN = auto()       # :=
@@ -128,6 +129,7 @@ KEYWORDS = {
     "METHOD": TokenType.METHOD,
     "CONSTRUCTOR": TokenType.CONSTRUCTOR,
     "FROM": TokenType.FROM,
+    "USER": TokenType.USER,
 }
 
 

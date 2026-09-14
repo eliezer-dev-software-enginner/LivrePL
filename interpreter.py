@@ -478,6 +478,20 @@ class Interpreter:
                 return str(int(v))
             return str(v)
 
+        def b_cvaltochar(args):
+            v = args[0]
+            if v is None:
+                return ""
+            if isinstance(v, bool):
+                return ".T." if v else ".F."
+            if isinstance(v, float) and v.is_integer():
+                return str(int(v))
+            if isinstance(v, (int, float)):
+                return str(v)
+            if isinstance(v, str):
+                return v
+            raise AdvPLRuntimeError("cValToChar: tipo não suportado")
+
         def b_val(args):
             s = args[0].strip()
             try:
@@ -579,6 +593,7 @@ class Interpreter:
             "UPPER": b_upper,
             "LOWER": b_lower,
             "STR": b_str,
+            "CVALTOCHAR": b_cvaltochar,
             "VAL": b_val,
             "SPACE": b_space,
             "PADR": b_padr,

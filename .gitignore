@@ -11,8 +11,11 @@ build/
 # Testes locais
 test_*.py
 *.prw.test
+exercicios/
 
 # IDEs / editores
 .vscode/
 .idea/
 *.swp
+
+

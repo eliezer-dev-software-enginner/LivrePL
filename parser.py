@@ -217,17 +217,17 @@ class Parser:
 
     def is_function_start(self):
         # Um novo bloco de topo começa em: FUNCTION, STATIC FUNCTION,
-        # CLASS, ou METHOD
+        # USER FUNCTION, CLASS, ou METHOD
         if self.at(TokenType.FUNCTION):
             return True
-        if self.at(TokenType.STATIC) and self.peek(1).type == TokenType.FUNCTION:
+        if self.at(TokenType.STATIC, TokenType.USER) and self.peek(1).type == TokenType.FUNCTION:
             return True
         if self.at(TokenType.CLASS, TokenType.METHOD):
             return True
         return False
 
     def parse_function(self):
-        if self.at(TokenType.STATIC):
+        if self.at(TokenType.STATIC, TokenType.USER):
             self.advance()
         self.expect(TokenType.FUNCTION)
         name = self.expect(TokenType.IDENTIFIER).value
