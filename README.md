@@ -20,6 +20,8 @@ Um interpretador tree-walking que executa scripts `.prw` de AdvPL diretamente no
 - **Code blocks**: `{|x,y| x+y}` com closure de leitura + Eval()
 - **Excecoes**: `UserException(cMsg)` cria um objeto `ERROR` com `:Description` e lanca; `Throw(valor)` lanca qualquer valor/objeto (inclusive classes de excecao do proprio usuario)
 - **24 funcoes nativas**: Len, Str, CValToChar, AllTrim, Upper, Lower, SubStr, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, Round, Int, Abs, Max, Min, Eval, UserException, Throw
+- **Saida**: `?` (com quebra de linha) e `??` (nao quebra linha, concatena na mesma linha)
+- **Constante global `CRLF`**: `Chr(13)+Chr(10)` pre-definida como PUBLIC, disponivel em qualquer script (padrao do PROTHEUS.CH)
 - **Preprocessador basico**: `#define`, `#include` (no-op)
 
 ## Como testar
@@ -175,6 +177,7 @@ Documentacao detalhada de cada etapa esta em `docs/`:
 - `interpretador-advpl-04b-userexception-throw.md` - adendo: `UserException`/`Throw` no BEGIN SEQUENCE
 - `interpretador-advpl-04c-user-function.md` - correcao: `USER FUNCTION`
 - `interpretador-advpl-04d-cvaltochar.md` - correcao: `CValToChar`
+- `interpretador-advpl-04e-crlf-dois-interrogacao.md` - correcao: `CRLF` e `??`
 - `CONTEXT.md` - contexto do projeto e rotina de trabalho
 - `DECISIONS.md` - registro de modificacoes
 

@@ -71,6 +71,7 @@ class Interpreter:
         for m in program.methods:
             self.methods[(m.class_name.upper(), m.method_name.upper())] = m
         self.globals = {}     # PUBLIC
+        self.globals["CRLF"] = "\r\n"  # constante padrão do PROTHEUS.CH
         self.statics = {}     # nome_funcao -> {nome_var: valor}
         self.call_stack = []  # lista de Frame
         self.builtins = self._build_builtins()

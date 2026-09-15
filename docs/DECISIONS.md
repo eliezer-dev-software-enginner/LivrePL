@@ -2,6 +2,17 @@
 
 Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo não é corrigido/alterado, apenas recebe entradas para ficar como histórico.
 
+## 2026-09-15
+
+### 04e — `CRLF` e `??`
+- Arquivo: `interpreter.py`, `README.md`
+- Constante `CRLF` (`Chr(13)+Chr(10)`) injetada em `self.globals` na criacao do `Interpreter`, disponivel em qualquer script como PUBLIC normal (sem necessidade de `#include`)
+- `??` (impressao sem quebra de linha) ja era reconhecido pelo lexer/parser; confirmado com teste real descrito no doc 04e
+- Teste real: script temporario do doc 04e (User Function `ex`, laco FOR gravando em `cResultado` com `CRLF` e `?? cResultado`) imprime linha a linha `1 + i = n`
+- Regressao OK: `exemplos/ola.prw`, `exemplos/todas-etapas.prw`, `python interpreter.py`
+- README.md atualizado: bullets de saida (`?`/`??`) e constante `CRLF`; referencia ao doc 04e
+- Ref.: `docs/interpretador-advpl-04e-crlf-dois-interrogacao.md`
+
 ## 2026-09-14
 
 ### 04b — `UserException` / `Throw` no BEGIN SEQUENCE
