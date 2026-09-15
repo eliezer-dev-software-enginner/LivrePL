@@ -351,6 +351,8 @@ class Parser:
         self.skip_terminator()
         body = self.parse_statement_list(stop_types=(TokenType.NEXT,))
         self.expect(TokenType.NEXT)
+        if self.at(TokenType.IDENTIFIER):
+            self.advance()  # 'NEXT x' -- nome da variável é opcional/documentacional
         return ForLoop(var, start, end, step, body)
 
     def parse_while(self):

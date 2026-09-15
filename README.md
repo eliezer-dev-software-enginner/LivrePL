@@ -178,6 +178,7 @@ Documentacao detalhada de cada etapa esta em `docs/`:
 - `interpretador-advpl-04c-user-function.md` - correcao: `USER FUNCTION`
 - `interpretador-advpl-04d-cvaltochar.md` - correcao: `CValToChar`
 - `interpretador-advpl-04e-crlf-dois-interrogacao.md` - correcao: `CRLF` e `??`
+- `interpretador-advpl-04f-next-com-variavel.md` - correcao: `NEXT x` (variavel opcional apos NEXT)
 - `CONTEXT.md` - contexto do projeto e rotina de trabalho
 - `DECISIONS.md` - registro de modificacoes
 
