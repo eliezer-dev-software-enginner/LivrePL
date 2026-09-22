@@ -557,6 +557,11 @@ class Interpreter:
                 return v is False
             return False
 
+        def b_iif(args):
+            if len(args) != 3:
+                raise AdvPLRuntimeError("IIf espera 3 argumentos")
+            return args[1] if truthy(args[0]) else args[2]
+
         def b_round(args):
             v, decimals = args[0], int(args[1])
             return round(v, decimals)
@@ -604,6 +609,7 @@ class Interpreter:
             "ALEN": b_alen,
             "VALTYPE": b_valtype,
             "EMPTY": b_empty,
+            "IIF": b_iif,
             "ROUND": b_round,
             "INT": b_int,
             "ABS": b_abs,

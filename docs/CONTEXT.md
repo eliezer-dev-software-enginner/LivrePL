@@ -31,14 +31,14 @@ arquivo.prw
 ## Funcionalidades implementadas
 
 - Tipos: caracter, numérico, lógico, array, NIL, code block
-- Controle de fluxo: IF/ELSEIF/ELSE, FOR..TO..STEP/NEXT, DO WHILE/ENDDO, DO CASE, BEGIN SEQUENCE/RECOVER
+- Controle de fluxo: IF/ELSEIF/ELSE, FOR..TO..STEP/NEXT, DO WHILE/ENDDO, WHILE/ENDDO, DO CASE, BEGIN SEQUENCE/RECOVER
 - Escopo: LOCAL, PRIVATE (dinâmico), PUBLIC, STATIC (persistente)
 - OOP: CLASS/DATA/METHOD, herança simples (FROM), SELF, `::attr`, `obj:Metodo()`
 - Code blocks `{|x| expr}` com closure de leitura + `Eval()`
 - Exceções: `UserException(cMsg)` e `Throw(valor)` capturadas por `RECOVER USING x`
 - Exceções internas do interpretador convertidas em objeto `ERROR` com `:Description`
 - `User Function` como prefixo opcional de `FUNCTION`
-- 24 funções nativas: Len, SubStr, AllTrim, Upper, Lower, Str, CValToChar, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, Round, Int, Abs, Max, Min, Eval, UserException, Throw
+- 25 funções nativas: Len, SubStr, AllTrim, Upper, Lower, Str, CValToChar, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, IIf, Round, Int, Abs, Max, Min, Eval, UserException, Throw
 
 ## Convenções de código
 

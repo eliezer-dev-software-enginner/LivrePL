@@ -270,6 +270,8 @@ class Parser:
             return self.parse_if()
         if t == TokenType.FOR:
             return self.parse_for()
+        if t == TokenType.WHILE:
+            return self.parse_while()
         if t == TokenType.DO:
             if self.peek(1).type == TokenType.CASE:
                 return self.parse_docase()
@@ -356,7 +358,8 @@ class Parser:
         return ForLoop(var, start, end, step, body)
 
     def parse_while(self):
-        self.expect(TokenType.DO)
+        if self.at(TokenType.DO):
+            self.advance()
         self.expect(TokenType.WHILE)
         cond = self.parse_expr()
         self.skip_terminator()

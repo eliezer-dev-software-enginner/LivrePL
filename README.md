@@ -14,12 +14,12 @@ Um interpretador tree-walking que executa scripts `.prw` de AdvPL diretamente no
 ## Funcionalidades
 
 - **Tipos**: Character, Numeric, Logical, Array, NIL, Block (code block)
-- **Controle de fluxo**: IF/ELSEIF/ELSE, FOR..TO..STEP/NEXT, DO WHILE/ENDDO, DO CASE/OTHERWISE, BEGIN SEQUENCE/RECOVER (recupera tanto `UserException`/`Throw` quanto erros internos do interpretador)
+- **Controle de fluxo**: IF/ELSEIF/ELSE, FOR..TO..STEP/NEXT, DO WHILE/ENDDO, WHILE/ENDDO, DO CASE/OTHERWISE, BEGIN SEQUENCE/RECOVER (recupera tanto `UserException`/`Throw` quanto erros internos do interpretador)
 - **Escopo**: LOCAL, PRIVATE (dinamico pela pilha), PUBLIC, STATIC (persistente entre chamadas)
 - **OOP**: CLASS/DATA/METHOD, heranca simples (FROM), SELF, ::attr, obj:Metodo()
 - **Code blocks**: `{|x,y| x+y}` com closure de leitura + Eval()
 - **Excecoes**: `UserException(cMsg)` cria um objeto `ERROR` com `:Description` e lanca; `Throw(valor)` lanca qualquer valor/objeto (inclusive classes de excecao do proprio usuario)
-- **24 funcoes nativas**: Len, Str, CValToChar, AllTrim, Upper, Lower, SubStr, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, Round, Int, Abs, Max, Min, Eval, UserException, Throw
+- **25 funcoes nativas**: Len, Str, CValToChar, AllTrim, Upper, Lower, SubStr, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, IIf, Round, Int, Abs, Max, Min, Eval, UserException, Throw
 - **Saida**: `?` (com quebra de linha) e `??` (nao quebra linha, concatena na mesma linha)
 - **Constante global `CRLF`**: `Chr(13)+Chr(10)` pre-definida como PUBLIC, disponivel em qualquer script (padrao do PROTHEUS.CH)
 - **Preprocessador basico**: `#define`, `#include` (no-op)

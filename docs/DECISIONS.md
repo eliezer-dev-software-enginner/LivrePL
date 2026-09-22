@@ -2,6 +2,14 @@
 
 Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo não é corrigido/alterado, apenas recebe entradas para ficar como histórico.
 
+## 2026-09-22
+
+### Suporte ao TestLab: `WHILE` direto e `IIf`
+- Arquivos: `parser.py`, `interpreter.py`, `README.md`
+- `WHILE ... ENDDO` passa a ser aceito alem de `DO WHILE ... ENDDO`.
+- `IIf(condicao, valorVerdadeiro, valorFalso)` passa a ser funcao nativa, com tres argumentos.
+- Uso: interpretacao headless de fontes reais AdvPL pelo projeto irmao `advpl-testlab`.
+
 ### 04f — `NEXT x` (nome da variável após NEXT)
 - Arquivo: `parser.py`, `README.md`
 - `parse_for` passou a consumir opcionalmente um `IDENTIFIER` logo após `NEXT` (apenas documentacional/legibilidade, descartado sem validação)
