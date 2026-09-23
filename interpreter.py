@@ -7,7 +7,7 @@
 from parser import (
     parse_source, Program, FunctionDecl, VarDecl, Assign, If, ForLoop,
     WhileLoop, Return, PrintStmt, LoopStmt, ExitStmt, ExprStmt, BinOp,
-    UnaryOp, Literal, Identifier, ArrayLiteral, Index, Call,
+    UnaryOp, Literal, Identifier, ReferenceArg, ArrayLiteral, Index, Call,
     CaseStmt, SequenceStmt, BlockLiteral, MemberAccess, MethodCall,
 )
 from naming import NamePolicy
@@ -86,6 +86,18 @@ class AdvPLBlock:
         self.captured_frame = captured_frame
 
 
+class VariableReference:
+    def __init__(self, mapping, key):
+        self.mapping = mapping
+        self.key = key
+
+    def get(self):
+        return self.mapping[self.key]
+
+    def set(self, value):
+        self.mapping[self.key] = value
+
+
 # ---------- Interpretador ----------
 
 class Interpreter:
@@ -142,19 +154,23 @@ class Interpreter:
             raise AdvPLRuntimeError("SELF usado fora de um METHOD")
 
         if upper in frame.locals:
-            return frame.locals[upper]
+            value = frame.locals[upper]
+            return value.get() if isinstance(value, VariableReference) else value
 
         bucket = self.statics.get(frame.func_name)
         if bucket and upper in bucket:
-            return bucket[upper]
+            value = bucket[upper]
+            return value.get() if isinstance(value, VariableReference) else value
 
         # PRIVATE: escopo dinâmico -- procura do frame atual até a base da pilha
         for f in reversed(self.call_stack):
             if upper in f.privates:
-                return f.privates[upper]
+                value = f.privates[upper]
+                return value.get() if isinstance(value, VariableReference) else value
 
         if upper in self.globals:
-            return self.globals[upper]
+            value = self.globals[upper]
+            return value.get() if isinstance(value, VariableReference) else value
 
         raise AdvPLRuntimeError(f"Variável '{name}' não declarada")
 
@@ -163,26 +179,71 @@ class Interpreter:
         frame = self.call_stack[-1]
 
         if upper in frame.locals:
-            frame.locals[upper] = value
+            current = frame.locals[upper]
+            if isinstance(current, VariableReference):
+                current.set(value)
+            else:
+                frame.locals[upper] = value
             return
 
         bucket = self.statics.get(frame.func_name)
         if bucket and upper in bucket:
-            bucket[upper] = value
+            current = bucket[upper]
+            if isinstance(current, VariableReference):
+                current.set(value)
+            else:
+                bucket[upper] = value
             return
 
         for f in reversed(self.call_stack):
             if upper in f.privates:
-                f.privates[upper] = value
+                current = f.privates[upper]
+                if isinstance(current, VariableReference):
+                    current.set(value)
+                else:
+                    f.privates[upper] = value
                 return
 
         if upper in self.globals:
-            self.globals[upper] = value
+            current = self.globals[upper]
+            if isinstance(current, VariableReference):
+                current.set(value)
+            else:
+                self.globals[upper] = value
             return
 
         # não declarada em lugar nenhum -> criada implicitamente como PRIVATE
         # (comportamento padrão do Clipper/AdvPL para atribuição sem declaração)
         frame.privates[upper] = value
+
+    def reference_to(self, name):
+        upper = self.name_policy.key(name)
+        frame = self.call_stack[-1]
+        if upper in frame.locals:
+            mapping = frame.locals
+        else:
+            bucket = self.statics.get(frame.func_name)
+            if bucket is not None and upper in bucket:
+                mapping = bucket
+            else:
+                mapping = next((f.privates for f in reversed(self.call_stack)
+                                if upper in f.privates), None)
+                if mapping is None and upper in self.globals:
+                    mapping = self.globals
+        if mapping is None:
+            raise AdvPLRuntimeError(f"Variável '{name}' não declarada para passagem por referência")
+        value = mapping[upper]
+        return value if isinstance(value, VariableReference) else VariableReference(mapping, upper)
+
+    def eval_argument(self, node):
+        if isinstance(node, ReferenceArg):
+            try:
+                return self.reference_to(node.name)
+            except AdvPLRuntimeError as error:
+                if error.line is None:
+                    error.line = node.line
+                raise
+        return self.eval(node)
 
     # --- chamada de função ---
     def call_function(self, name, args):
@@ -205,6 +266,10 @@ class Interpreter:
             return result
 
         if upper in self.builtins:
+            if any(isinstance(arg, VariableReference) for arg in args):
+                raise AdvPLRuntimeError(
+                    f"Passagem por referência não suportada pela função nativa '{name}'"
+                )
             return self.builtins[upper](args)
 
         # se o nome chamado não é FUNCTION nem nativa, mas é o nome de uma
@@ -442,8 +507,11 @@ class Interpreter:
             return container[self.array_index(container, idx)]
 
         if isinstance(node, Call):
-            args = [self.eval(a) for a in node.args]
+            args = [self.eval_argument(a) for a in node.args]
             return self.call_function(node.name, args)
+
+        if isinstance(node, ReferenceArg):
+            raise AdvPLRuntimeError("'@' só pode ser usado em argumento de função")
 
         if isinstance(node, UnaryOp):
             value = self.eval(node.expr)
@@ -485,7 +553,7 @@ class Interpreter:
 
         if isinstance(node, MethodCall):
             obj = self.eval(node.target)
-            args = [self.eval(a) for a in node.args]
+            args = [self.eval_argument(a) for a in node.args]
             return self.call_method(obj, node.name, args)
 
         if isinstance(node, BlockLiteral):

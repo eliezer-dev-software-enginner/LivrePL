@@ -141,6 +141,10 @@ class Identifier:
     def __init__(self, name):
         self.name = name
 
+class ReferenceArg:
+    def __init__(self, name):
+        self.name = name
+
 class ArrayLiteral:
     def __init__(self, elements):
         self.elements = elements
@@ -556,6 +560,10 @@ class Parser:
         return left
 
     def parse_unary(self):
+        if self.at(TokenType.AT):
+            token = self.advance()
+            name = self.expect(TokenType.IDENTIFIER, "'@' exige nome de variável").value
+            return self.located(ReferenceArg(name), token.line)
         if self.at(TokenType.MINUS, TokenType.PLUS):
             token = self.advance()
             expr = self.parse_unary()
@@ -567,12 +575,7 @@ class Parser:
         while True:
             if self.at(TokenType.LPAREN):
                 self.advance()
-                args = []
-                if not self.at(TokenType.RPAREN):
-                    args.append(self.parse_expr())
-                    while self.at(TokenType.COMMA):
-                        self.advance()
-                        args.append(self.parse_expr())
+                args = self.parse_call_args()
                 self.expect(TokenType.RPAREN)
                 if isinstance(expr, Identifier):
                     expr = self.located(Call(expr.name, args), expr.line)
@@ -592,6 +595,19 @@ class Parser:
             else:
                 break
         return expr
+
+    def parse_call_args(self):
+        args = []
+        if self.at(TokenType.RPAREN):
+            return args
+        while True:
+            if self.at(TokenType.COMMA, TokenType.RPAREN):
+                args.append(self.located(Literal(None), self.current().line))
+            else:
+                args.append(self.parse_expr())
+            if not self.at(TokenType.COMMA):
+                return args
+            self.advance()
 
     def parse_primary(self):
         tok = self.current()
@@ -749,6 +765,8 @@ def dump(node, indent=0):
         print(f"{pad}Literal {node.value!r}")
     elif isinstance(node, Identifier):
         print(f"{pad}Identifier {node.name}")
+    elif isinstance(node, ReferenceArg):
+        print(f"{pad}ReferenceArg @{node.name}")
     elif isinstance(node, ArrayLiteral):
         print(f"{pad}ArrayLiteral")
         for e in node.elements:

@@ -38,6 +38,8 @@ arquivo.prw
 - Exceções: `UserException(cMsg)` e `Throw(valor)` capturadas por `RECOVER USING x`
 - Exceções internas do interpretador convertidas em objeto `ERROR` com `:Description`
 - `User Function` como prefixo opcional de `FUNCTION`
+- `@nome` passa variavel por referencia a funcoes/metodos AdvPL definidos no fonte; alteracoes do parametro atualizam o escopo de origem. Funcoes nativas nao recebem `@`.
+- Chamadas de funcoes/metodos aceitam posicoes de argumento vazias entre virgulas, representadas como `NIL` na AST.
 - Operador `%` de modulo, com precedencia de multiplicacao/divisao; argumentos opcionais da entrada via `--args-json`.
 - `--arg` passa cada parametro como texto, sem exigir aspas JSON internas do shell; `Val()` rejeita valores nao textuais com `AdvPLRuntimeError`.
 - `naming.py` centraliza os perfis de nomes: `modern` conserva o identificador completo; `legacy10` usa dez caracteres significativos e `U_` mais oito para funcoes de usuario, detectando colisoes de declaracoes.

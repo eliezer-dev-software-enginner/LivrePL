@@ -73,6 +73,7 @@ class TokenType(Enum):
     POWER = auto()        # **
     PLUS_ASSIGN = auto()  # +=
     MINUS_ASSIGN = auto() # -=
+    AT = auto()
 
     # Delimitadores
     LPAREN = auto()
@@ -308,6 +309,10 @@ class Lexer:
 
         if ch == "%":
             self.add_token(TokenType.PERCENT, "%")
+            return
+
+        if ch == "@":
+            self.add_token(TokenType.AT, "@")
             return
 
         if ch == "|":

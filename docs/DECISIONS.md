@@ -92,3 +92,16 @@ Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo 
 - `main.py` nao captura mais erros de lexer, parser, nomes ou runtime do `.prw`; o Python mostra traceback e retorna codigo nao zero.
 - Mensagens de uso incorreto das opcoes da CLI continuam com `[ERRO]` e codigo 2.
 - Os testes foram atualizados para verificar a excecao propagada e a saida real do processo.
+
+## 2026-09-23 — Parametros por referencia
+
+- O lexer reconhece `@` e o parser representa `@nome` como argumento por referencia.
+- O interpretador liga parametros a variaveis `LOCAL`, `PRIVATE`, `PUBLIC` ou `STATIC` do chamador; leitura, atribuicao e repasse de referencia preservam o mesmo valor de origem.
+- Fora de argumentos de chamada, `@` gera erro explicito. Funcoes nativas do LivrePL ainda nao implementam parametros por referencia.
+- Uma fixture propria reproduz o exercicio `ex13b.prw` sem depender do repositorio `caminho-protheus` nos testes do LivrePL.
+
+## 2026-09-23 — Argumentos omitidos em chamadas
+
+- O parser aceita lacunas em listas de argumentos de funcoes e metodos, inclusive quando ha comentario de bloco entre virgulas. Cada lacuna vira `Literal(None)` e mantem sua posicao.
+- Testes cobrem lacunas iniciais, intermediarias e finais, chamadas sem argumentos e preservacao de erro sintatico real.
+- Em `ZA1MVC.prw`, isso elimina o falso erro de sintaxe em `AddFields`; a verificacao seguinte encontra `oStruZA1` nao declarado, divergente do `oStruct` existente no proprio fonte.

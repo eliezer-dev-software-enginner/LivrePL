@@ -16,6 +16,8 @@ Um interpretador tree-walking que executa scripts `.prw` de AdvPL diretamente no
 - **Tipos**: Character, Numeric, Logical, Array, NIL, Block (code block)
 - **Controle de fluxo**: IF/ELSEIF/ELSE, FOR..TO..STEP/NEXT, DO WHILE/ENDDO, WHILE/ENDDO, DO CASE/OTHERWISE, BEGIN SEQUENCE/RECOVER (recupera tanto `UserException`/`Throw` quanto erros internos do interpretador)
 - **Escopo**: LOCAL, PRIVATE (dinamico pela pilha), PUBLIC, STATIC (persistente entre chamadas)
+- **Parametros por referencia**: `@variavel` em chamadas de funcoes e metodos do proprio `.prw` permite que o parametro altere a variavel de quem chamou. Sem `@`, escalares sao passados por valor. O operador nao e suportado em funcoes nativas do LivrePL.
+- **Argumentos omitidos**: chamadas como `Funcao(1,,3)` e `oModel:AddFields('ID', /*cOwner*/, oStruct)` preservam a posicao vazia como `NIL`; comentarios entre virgulas nao viram argumentos.
 - **OOP**: CLASS/DATA/METHOD, heranca simples (FROM), SELF, ::attr, obj:Metodo()
 - **Code blocks**: `{|x,y| x+y}` com closure de leitura + Eval()
 - **Excecoes**: `UserException(cMsg)` cria um objeto `ERROR` com `:Description` e lanca; `Throw(valor)` lanca qualquer valor/objeto (inclusive classes de excecao do proprio usuario)
@@ -37,6 +39,8 @@ Um interpretador tree-walking que executa scripts `.prw` de AdvPL diretamente no
 python main.py exemplos/ola.prw
 python main.py exemplos/todas-etapas.prw
 ```
+
+O nome da funcao de entrada pode diferir do nome do arquivo. Por exemplo, se `ex13b.prw` declara `User Function ex13()`, execute `python main.py ex13b.prw ex13`.
 
 ### Ver a AST gerada
 
