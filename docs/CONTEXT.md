@@ -25,7 +25,7 @@ arquivo.prw
    -> interpreter.py    (Etapas 3+4: tree-walking executor)
 ```
 
-- `main.py` — CLI: `python main.py arquivo.prw [FuncaoDeEntrada] [--ast]`. Entry point padrão é `MAIN`.
+- `main.py` — CLI: `python main.py arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]`. Entry point padrão é `MAIN`.
 - `docs/` — documentação detalhada de cada etapa e dos adendos/correções.
 
 ## Funcionalidades implementadas
@@ -38,6 +38,9 @@ arquivo.prw
 - Exceções: `UserException(cMsg)` e `Throw(valor)` capturadas por `RECOVER USING x`
 - Exceções internas do interpretador convertidas em objeto `ERROR` com `:Description`
 - `User Function` como prefixo opcional de `FUNCTION`
+- Operador `%` de modulo, com precedencia de multiplicacao/divisao; argumentos opcionais da entrada via `--args-json`.
+- `--arg` passa cada parametro como texto, sem exigir aspas JSON internas do shell; `Val()` rejeita valores nao textuais com erro AdvPL, sem traceback Python.
+- `naming.py` centraliza os perfis de nomes: `modern` conserva o identificador completo; `legacy10` usa dez caracteres significativos e `U_` mais oito para funcoes de usuario, detectando colisoes de declaracoes.
 - 25 funções nativas: Len, SubStr, AllTrim, Upper, Lower, Str, CValToChar, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, IIf, Round, Int, Abs, Max, Min, Eval, UserException, Throw
 
 ## Convenções de código

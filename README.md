@@ -21,6 +21,7 @@ Um interpretador tree-walking que executa scripts `.prw` de AdvPL diretamente no
 - **Excecoes**: `UserException(cMsg)` cria um objeto `ERROR` com `:Description` e lanca; `Throw(valor)` lanca qualquer valor/objeto (inclusive classes de excecao do proprio usuario)
 - **25 funcoes nativas**: Len, Str, CValToChar, AllTrim, Upper, Lower, SubStr, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, IIf, Round, Int, Abs, Max, Min, Eval, UserException, Throw
 - **Saida**: `?` (com quebra de linha) e `??` (nao quebra linha, concatena na mesma linha)
+- **Modulo**: `%` calcula o resto da divisao, com a mesma precedencia de `*` e `/`.
 - **Constante global `CRLF`**: `Chr(13)+Chr(10)` pre-definida como PUBLIC, disponivel em qualquer script (padrao do PROTHEUS.CH)
 - **Preprocessador basico**: `#define`, `#include` (no-op)
 
@@ -49,6 +50,20 @@ python main.py --ast exemplos/todas-etapas.prw
 python main.py arquivo.prw NOMEFUNC
 ```
 
+Para passar argumentos à função de entrada, informe um array JSON em `--args-json`. Por exemplo, no PowerShell, a partir de `caminho-protheus`:
+
+```powershell
+python ..\livrePL\main.py .\Fontes\exercicios-sintaxe\nivel1\ex5.prw ex5 --args-json '["5"]'
+```
+
+Algumas configurações do Windows PowerShell removem as aspas internas antes de entregar o JSON ao Python. Para passar texto sem depender desse tratamento de aspas, prefira `--arg` (repita a opção para vários parâmetros):
+
+```powershell
+python ..\livrePL\main.py .\Fontes\exercicios-sintaxe\nivel1\ex5.prw ex5 --arg 5
+```
+
+O resultado é `eh impar`. Use `--arg 4` para testar o caminho par. `--args-json` continua disponível quando o tipo do argumento importa; `--arg` e `--args-json` não podem ser combinados. Sem argumentos, a chamada mantém o comportamento anterior: cada parâmetro ausente recebe `NIL`. `Val()` exige texto e informa um erro AdvPL quando recebe outro tipo.
+
 ### Testar um User Function
 
 Scripts AdvPL costumam declarar o ponto de entrada como `User Function`, nao como `Function Main()`. O interpretador aceita as duas formas — para executar um `User Function`, passe o nome da funcao como entry point:
@@ -69,6 +84,16 @@ Dev
 ```
 
 Se o script so tiver `User Function` (sem `Function Main()`), executar sem passar o nome gera o erro `Funcao de entrada 'MAIN' nao encontrada` — basta passar o nome da funcao.
+
+### Perfis de nomes
+
+O perfil `modern` e o padrao do LivrePL: nomes completos, sem truncamento. Para simular a regra historica dos dez caracteres significativos, passe `--name-profile legacy10`:
+
+```powershell
+python main.py arquivo.prw MinhaFuncao --name-profile legacy10
+```
+
+Nesse perfil, funcoes, classes, metodos e variaveis sao resolvidos pelos dez primeiros caracteres; uma `User Function` tambem tem o simbolo externo `U_` seguido dos oito primeiros caracteres do nome. Declaracoes diferentes que colidam geram erro explicito antes da execucao, em vez de sobrescrever uma definicao. A opcao e uma simulacao de compatibilidade, nao uma garantia de comportamento para toda versao do AppServer.
 
 ### Rodar o modulo interpreter diretamente
 

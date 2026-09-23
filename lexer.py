@@ -69,6 +69,7 @@ class TokenType(Enum):
     MINUS = auto()        # -
     STAR = auto()         # *
     SLASH = auto()        # /
+    PERCENT = auto()      # %
     POWER = auto()        # **
     PLUS_ASSIGN = auto()  # +=
     MINUS_ASSIGN = auto() # -=
@@ -303,6 +304,10 @@ class Lexer:
 
         if ch == "/":
             self.add_token(TokenType.SLASH, "/")
+            return
+
+        if ch == "%":
+            self.add_token(TokenType.PERCENT, "%")
             return
 
         if ch == "|":

@@ -2,6 +2,27 @@
 
 Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo não é corrigido/alterado, apenas recebe entradas para ficar como histórico.
 
+## 2026-09-23
+
+### Perfis de nomes da linguagem
+- Arquivos: `naming.py`, `parser.py`, `interpreter.py`, `main.py`, `README.md`, `docs/CONTEXT.md`, `tests/test_name_profiles.py`.
+- O perfil `modern` permanece como padrao e nao trunca nomes, preservando os casos existentes.
+- O perfil opt-in `legacy10` resolve funcoes, classes, metodos e variaveis pelos dez primeiros caracteres; `User Function` tem simbolo externo `U_` mais oito caracteres.
+- Colisoes entre declaracoes de funcoes, classes, metodos ou variaveis no mesmo escopo produzem `NameCollisionError` antes da execucao. Nomes completos sao mantidos nas mensagens.
+- A CLI escolhe o perfil com `--name-profile`, sem alterar a sintaxe dos fontes.
+
+### Operador de modulo e argumentos da CLI
+- Arquivos: `lexer.py`, `parser.py`, `interpreter.py`, `main.py`, `README.md`, `docs/CONTEXT.md`, `tests/test_modulo_cli.py`.
+- `%` agora e reconhecido e executado como resto da divisao, com a mesma precedencia de `*` e `/`. Operandos nao numericos e modulo por zero geram erro claro.
+- `--args-json` recebe um array JSON e o passa a funcao de entrada; a execucao sem argumentos permanece igual.
+- Testes unitarios, exercicio real `ex5.prw` e regressao basica dos exemplos aprovados.
+
+### Argumento textual robusto no Windows PowerShell
+- Arquivos: `main.py`, `interpreter.py`, `README.md`, `docs/CONTEXT.md`, `tests/test_modulo_cli.py`.
+- Em algumas invocacoes nativas do Windows PowerShell, `--args-json '["5"]'` chega ao Python como `[5]`; o fonte `ex5.prw` chama `Val(cNum)` e esperava texto.
+- `--arg 5` passa explicitamente a string `"5"` e pode ser repetido para varios parametros. Nao pode ser combinado com `--args-json`.
+- `Val()` agora produz erro AdvPL claro para argumento nao textual, evitando `AttributeError` Python.
+
 ## 2026-09-22
 
 ### Suporte ao TestLab: `WHILE` direto e `IIf`

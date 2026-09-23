@@ -10,6 +10,7 @@ from parser import (
     UnaryOp, Literal, Identifier, ArrayLiteral, Index, Call,
     CaseStmt, SequenceStmt, BlockLiteral, MemberAccess, MethodCall,
 )
+from naming import NamePolicy
 
 
 class AdvPLRuntimeError(Exception):
@@ -64,12 +65,18 @@ class AdvPLBlock:
 # ---------- Interpretador ----------
 
 class Interpreter:
-    def __init__(self, program: Program):
-        self.functions = {f.name.upper(): f for f in program.functions}
-        self.classes = {c.name.upper(): c for c in program.classes}
+    def __init__(self, program: Program, name_profile="modern"):
+        self.name_policy = NamePolicy(name_profile)
+        self.name_policy.validate_program(program)
+        self.functions = {self.name_policy.key(f.name): f for f in program.functions}
+        self.user_functions = {
+            self.name_policy.user_symbol(f.name): f
+            for f in program.functions if f.kind == "USER"
+        }
+        self.classes = {self.name_policy.key(c.name): c for c in program.classes}
         self.methods = {}
         for m in program.methods:
-            self.methods[(m.class_name.upper(), m.method_name.upper())] = m
+            self.methods[(self.name_policy.key(m.class_name), self.name_policy.key(m.method_name))] = m
         self.globals = {}     # PUBLIC
         self.globals["CRLF"] = "\r\n"  # constante padrão do PROTHEUS.CH
         self.statics = {}     # nome_funcao -> {nome_var: valor}
@@ -78,13 +85,14 @@ class Interpreter:
 
     # --- ponto de entrada ---
     def run(self, entry="MAIN", args=None):
-        if entry.upper() not in self.functions:
+        key = self.name_policy.key(entry)
+        if key not in self.functions and key not in self.user_functions:
             raise AdvPLRuntimeError(f"Função de entrada '{entry}' não encontrada")
-        return self.call_function(entry.upper(), args or [])
+        return self.call_function(entry, args or [])
 
     # --- resolução/escrita de variáveis ---
     def declare(self, kind, name, value):
-        upper = name.upper()
+        upper = self.name_policy.key(name)
         frame = self.call_stack[-1]
         if kind == "LOCAL":
             frame.locals[upper] = value
@@ -101,7 +109,7 @@ class Interpreter:
             raise AdvPLRuntimeError(f"Tipo de declaração desconhecido: {kind}")
 
     def lookup(self, name):
-        upper = name.upper()
+        upper = self.name_policy.key(name)
         frame = self.call_stack[-1]
 
         if upper == "SELF":
@@ -127,7 +135,7 @@ class Interpreter:
         raise AdvPLRuntimeError(f"Variável '{name}' não declarada")
 
     def assign_existing(self, name, value):
-        upper = name.upper()
+        upper = self.name_policy.key(name)
         frame = self.call_stack[-1]
 
         if upper in frame.locals:
@@ -156,11 +164,12 @@ class Interpreter:
     def call_function(self, name, args):
         upper = name.upper()
 
-        if upper in self.functions:
-            decl = self.functions[upper]
-            frame = Frame(upper)
+        key = self.name_policy.key(name)
+        decl = self.functions.get(key) or self.user_functions.get(key)
+        if decl is not None:
+            frame = Frame(self.name_policy.key(decl.name))
             for i, param in enumerate(decl.params):
-                frame.locals[param.upper()] = args[i] if i < len(args) else None
+                frame.locals[self.name_policy.key(param)] = args[i] if i < len(args) else None
             self.call_stack.append(frame)
             try:
                 self.exec_block(decl.body)
@@ -177,8 +186,8 @@ class Interpreter:
         # se o nome chamado não é FUNCTION nem nativa, mas é o nome de uma
         # CLASS (ex.: Pessoa()), retorna uma instância "crua" da classe.
         # O padrão real do AdvPL: X() cria a instância, e :New(...) inicializa.
-        if upper in self.classes:
-            return self.instantiate(upper)
+        if key in self.classes:
+            return self.instantiate(key)
 
         raise AdvPLRuntimeError(f"Função '{name}' não encontrada")
 
@@ -190,7 +199,7 @@ class Interpreter:
         while cur and cur in self.classes:
             chain.append(cur)
             parent = self.classes[cur].parent
-            cur = parent.upper() if parent else None
+            cur = self.name_policy.key(parent) if parent else None
         return chain
 
     def instantiate(self, class_name_upper):
@@ -198,18 +207,18 @@ class Interpreter:
         obj = AdvPLObject(decl.name)
         for cname in reversed(self.class_chain(class_name_upper)):  # raiz -> folha
             for field in self.classes[cname].data_fields:
-                obj.attrs[field.upper()] = None
+                obj.attrs[self.name_policy.key(field)] = None
         return obj
 
     def call_method(self, obj, method_name, args):
-        upper_method = method_name.upper()
-        for cname in self.class_chain(obj.class_name.upper()):
+        upper_method = self.name_policy.key(method_name)
+        for cname in self.class_chain(self.name_policy.key(obj.class_name)):
             key = (cname, upper_method)
             if key in self.methods:
                 decl = self.methods[key]
                 frame = Frame(f"{cname}.{upper_method}", self_obj=obj)
                 for i, param in enumerate(decl.params):
-                    frame.locals[param.upper()] = args[i] if i < len(args) else None
+                    frame.locals[self.name_policy.key(param)] = args[i] if i < len(args) else None
                 self.call_stack.append(frame)
                 try:
                     self.exec_block(decl.body)
@@ -228,7 +237,7 @@ class Interpreter:
         frame = Frame("(block)")
         frame.locals = dict(block.captured_frame.locals)  # closure de leitura
         for i, param in enumerate(block.params):
-            frame.locals[param.upper()] = args[i] if i < len(args) else None
+            frame.locals[self.name_policy.key(param)] = args[i] if i < len(args) else None
         self.call_stack.append(frame)
         try:
             return self.eval(block.body_expr)
@@ -355,7 +364,7 @@ class Interpreter:
             obj = self.eval(target.target)
             if not isinstance(obj, AdvPLObject):
                 raise AdvPLRuntimeError("Tentativa de atribuir atributo em valor que não é objeto")
-            obj.attrs[target.name.upper()] = value
+            obj.attrs[self.name_policy.key(target.name)] = value
         else:
             raise AdvPLRuntimeError("Alvo de atribuição inválido")
 
@@ -404,7 +413,7 @@ class Interpreter:
             obj = self.eval(node.target)
             if not isinstance(obj, AdvPLObject):
                 raise AdvPLRuntimeError("Acesso de membro em valor que não é objeto")
-            upper = node.name.upper()
+            upper = self.name_policy.key(node.name)
             if upper not in obj.attrs:
                 raise AdvPLRuntimeError(
                     f"Atributo '{node.name}' não existe em objetos da classe '{obj.class_name}'"
@@ -434,6 +443,13 @@ class Interpreter:
             return left * right
         if op == "/":
             return left / right
+        if op == "%":
+            if (not isinstance(left, (int, float)) or isinstance(left, bool)
+                    or not isinstance(right, (int, float)) or isinstance(right, bool)):
+                raise AdvPLRuntimeError("Operador '%' exige operandos numericos")
+            if right == 0:
+                raise AdvPLRuntimeError("Operador '%': modulo por zero")
+            return left % right
         if op == "**":
             return left ** right
         if op == "==":
@@ -494,6 +510,8 @@ class Interpreter:
             raise AdvPLRuntimeError("cValToChar: tipo não suportado")
 
         def b_val(args):
+            if not args or not isinstance(args[0], str):
+                raise AdvPLRuntimeError("Val: esperado argumento caractere")
             s = args[0].strip()
             try:
                 if "." in s:
@@ -651,9 +669,9 @@ def to_display(value):
     return str(value)
 
 
-def run_source(source, entry="MAIN", args=None):
+def run_source(source, entry="MAIN", args=None, name_profile="modern"):
     program = parse_source(source)
-    interpreter = Interpreter(program)
+    interpreter = Interpreter(program, name_profile=name_profile)
     return interpreter.run(entry, args)
 
 

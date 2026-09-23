@@ -22,10 +22,11 @@ class Program:
         self.methods = methods or []
 
 class FunctionDecl:
-    def __init__(self, name, params, body):
+    def __init__(self, name, params, body, kind="FUNCTION"):
         self.name = name
         self.params = params
         self.body = body
+        self.kind = kind
 
 class VarDecl:
     def __init__(self, kind, name, expr):
@@ -227,8 +228,9 @@ class Parser:
         return False
 
     def parse_function(self):
+        kind = "FUNCTION"
         if self.at(TokenType.STATIC, TokenType.USER):
-            self.advance()
+            kind = self.advance().type.name
         self.expect(TokenType.FUNCTION)
         name = self.expect(TokenType.IDENTIFIER).value
         self.expect(TokenType.LPAREN)
@@ -242,7 +244,7 @@ class Parser:
         self.skip_terminator()
 
         body = self.parse_function_body()
-        return FunctionDecl(name, params, body)
+        return FunctionDecl(name, params, body, kind=kind)
 
     def parse_function_body(self):
         stmts = []
@@ -534,7 +536,7 @@ class Parser:
 
     def parse_term(self):
         left = self.parse_power()
-        while self.at(TokenType.STAR, TokenType.SLASH):
+        while self.at(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT):
             op = self.advance().value
             right = self.parse_power()
             left = BinOp(left, op, right)

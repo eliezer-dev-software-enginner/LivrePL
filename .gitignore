@@ -10,6 +10,7 @@ build/
 
 # Testes locais
 test_*.py
+!tests/test_*.py
 *.prw.test
 exercicios/
 
@@ -17,5 +18,4 @@ exercicios/
 .vscode/
 .idea/
 *.swp
-
 
