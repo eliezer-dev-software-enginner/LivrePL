@@ -64,6 +64,10 @@ python ..\livrePL\main.py .\Fontes\exercicios-sintaxe\nivel1\ex5.prw ex5 --arg 5
 
 O resultado é `eh impar`. Use `--arg 4` para testar o caminho par. `--args-json` continua disponível quando o tipo do argumento importa; `--arg` e `--args-json` não podem ser combinados. Sem argumentos, a chamada mantém o comportamento anterior: cada parâmetro ausente recebe `NIL`. `Val()` exige texto e informa um erro AdvPL quando recebe outro tipo.
 
+### Diagnosticos de execucao
+
+Erros no `.prw` agora lancam excecoes: o Python exibe o traceback no terminal e o processo termina com codigo diferente de zero, sem o prefixo `[ERRO]`. A mensagem da excecao inclui a linha da expressao e os tipos AdvPL envolvidos. Isso cobre concatenacao entre texto e numero, operadores aritmeticos e comparacoes com tipos incompativeis, divisao/modulo por zero, variavel ou funcao inexistente, indice invalido de array e argumentos incorretos em `Len`, `AllTrim`, `Upper`, `Lower` e `AAdd`. Por exemplo, `"Total: " + 7` produz `AdvPLRuntimeError: [linha 3] ... Use cValToChar() ...`. Erros de uso das opcoes da CLI ainda aparecem como mensagens `[ERRO]`. Diretivas removidas pelo preprocessador podem alterar a numeracao das linhas. Esses diagnosticos nao validam a logica do algoritmo: um laco que conta itens errados pode executar sem erro.
+
 ### Testar um User Function
 
 Scripts AdvPL costumam declarar o ponto de entrada como `User Function`, nao como `Function Main()`. O interpretador aceita as duas formas — para executar um `User Function`, passe o nome da funcao como entry point:

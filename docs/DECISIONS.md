@@ -79,3 +79,16 @@ Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo 
 - README.md atualizado: funcionalidades 04b/04d, contagem de nativas (21 -> 24), seção "Testar um User Function", referencia aos docs 04b/04c/04d
 - Correção do README: fragmento UTF-16 (`# LivrePL`) colado no fim do arquivo foi removido (quebrava a renderizacao no GitHub)
 - Subido para `origin/main` no repositório `LivrePL`
+
+## 2026-09-23 — Diagnosticos de runtime
+
+- Expressoes da AST passam a guardar a linha do token; `AdvPLRuntimeError` inclui `[linha N]` quando a origem e conhecida.
+- Operacoes aritmeticas, concatenacao, comparacoes, indices de array e alguns builtins frequentes validam tipos e limites antes da operacao Python.
+- `+` entre caractere e numerico sugere `cValToChar()`; erros exibem tipos AdvPL, nao tipos Python.
+- Foram adicionados testes de regressao para erros comuns e caminhos validos. A logica do algoritmo continua responsabilidade do programa AdvPL; a numeracao pode ser deslocada por preprocessamento que remove linhas.
+
+### Excecoes visiveis na CLI
+
+- `main.py` nao captura mais erros de lexer, parser, nomes ou runtime do `.prw`; o Python mostra traceback e retorna codigo nao zero.
+- Mensagens de uso incorreto das opcoes da CLI continuam com `[ERRO]` e codigo 2.
+- Os testes foram atualizados para verificar a excecao propagada e a saida real do processo.

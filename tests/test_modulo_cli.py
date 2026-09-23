@@ -66,18 +66,14 @@ class CliArgumentsTests(unittest.TestCase):
         self.assertEqual(0, code)
         self.assertEqual("eh impar\n", output.getvalue())
 
-    def test_numeric_argument_to_val_is_reported_without_traceback(self):
-        error = io.StringIO()
-        with contextlib.redirect_stderr(error):
-            code = main([
+    def test_numeric_argument_to_val_raises_exception(self):
+        with self.assertRaisesRegex(AdvPLRuntimeError, "Val: esperado argumento caractere"):
+            main([
                 str(ROOT / "tests" / "fixtures" / "modulo.prw"),
                 "Ex5",
                 "--args-json",
                 "[5]",
             ])
-        self.assertEqual(1, code)
-        self.assertIn("Val: esperado argumento caractere", error.getvalue())
-        self.assertNotIn("Traceback", error.getvalue())
 
     def test_rejects_mixing_text_and_json_arguments(self):
         error = io.StringIO()

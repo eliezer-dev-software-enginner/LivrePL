@@ -14,7 +14,31 @@ from naming import NamePolicy
 
 
 class AdvPLRuntimeError(Exception):
-    pass
+    def __init__(self, message, line=None):
+        super().__init__(message)
+        self.line = line
+
+    def __str__(self):
+        message = super().__str__()
+        return f"[linha {self.line}] {message}" if self.line is not None else message
+
+
+def advpl_type(value):
+    if value is None:
+        return "NIL"
+    if isinstance(value, bool):
+        return "lógico"
+    if isinstance(value, (int, float)):
+        return "numérico"
+    if isinstance(value, str):
+        return "caractere"
+    if isinstance(value, list):
+        return "array"
+    return "objeto"
+
+
+def is_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
 class ReturnSignal(Exception):
@@ -261,10 +285,15 @@ class Interpreter:
 
         elif isinstance(stmt, Assign):
             value = self.eval(stmt.expr)
-            if stmt.op == "+=":
-                value = self.apply_binop("+", self.eval(stmt.target), value)
-            elif stmt.op == "-=":
-                value = self.apply_binop("-", self.eval(stmt.target), value)
+            try:
+                if stmt.op == "+=":
+                    value = self.apply_binop("+", self.eval(stmt.target), value)
+                elif stmt.op == "-=":
+                    value = self.apply_binop("-", self.eval(stmt.target), value)
+            except AdvPLRuntimeError as error:
+                if error.line is None:
+                    error.line = getattr(stmt.target, "line", None)
+                raise
             self.assign_target(stmt.target, value)
 
         elif isinstance(stmt, If):
@@ -357,9 +386,12 @@ class Interpreter:
         elif isinstance(target, Index):
             container = self.eval(target.target)
             idx = self.eval(target.index_expr)
-            if not isinstance(container, list):
-                raise AdvPLRuntimeError("Tentativa de indexar valor que não é array")
-            container[int(idx) - 1] = value  # arrays AdvPL são 1-based
+            try:
+                container[self.array_index(container, idx)] = value
+            except AdvPLRuntimeError as error:
+                if error.line is None:
+                    error.line = getattr(target, "line", None)
+                raise
         elif isinstance(target, MemberAccess):
             obj = self.eval(target.target)
             if not isinstance(obj, AdvPLObject):
@@ -370,6 +402,31 @@ class Interpreter:
 
     # --- avaliação de expressões ---
     def eval(self, node):
+        try:
+            return self._eval(node)
+        except AdvPLRuntimeError as error:
+            if error.line is None:
+                error.line = getattr(node, "line", None)
+            raise
+
+    @staticmethod
+    def array_index(container, idx):
+        if not isinstance(container, list):
+            raise AdvPLRuntimeError(
+                f"Acesso por índice exige array; recebido {advpl_type(container)}"
+            )
+        if not is_number(idx) or not float(idx).is_integer():
+            raise AdvPLRuntimeError(
+                f"Índice de array deve ser numérico inteiro; recebido {advpl_type(idx)}"
+            )
+        index = int(idx)
+        if index < 1 or index > len(container):
+            raise AdvPLRuntimeError(
+                f"Índice {index} fora dos limites do array (1..{len(container)})"
+            )
+        return index - 1
+
+    def _eval(self, node):
         if isinstance(node, Literal):
             return node.value
 
@@ -382,9 +439,7 @@ class Interpreter:
         if isinstance(node, Index):
             container = self.eval(node.target)
             idx = self.eval(node.index_expr)
-            if not isinstance(container, list):
-                raise AdvPLRuntimeError("Tentativa de indexar valor que não é array")
-            return container[int(idx) - 1]
+            return container[self.array_index(container, idx)]
 
         if isinstance(node, Call):
             args = [self.eval(a) for a in node.args]
@@ -393,8 +448,16 @@ class Interpreter:
         if isinstance(node, UnaryOp):
             value = self.eval(node.expr)
             if node.op == "-":
+                if not is_number(value):
+                    raise AdvPLRuntimeError(
+                        f"Operador unário '-' exige numérico; recebido {advpl_type(value)}"
+                    )
                 return -value
             if node.op == "+":
+                if not is_number(value):
+                    raise AdvPLRuntimeError(
+                        f"Operador unário '+' exige numérico; recebido {advpl_type(value)}"
+                    )
                 return value
             if node.op == "NOT":
                 return not truthy(value)
@@ -434,41 +497,61 @@ class Interpreter:
         if op == "+":
             if isinstance(left, str) and isinstance(right, str):
                 return left + right
-            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+            if is_number(left) and is_number(right):
                 return left + right
-            raise AdvPLRuntimeError(f"Operação '+' inválida entre {type(left)} e {type(right)}")
-        if op == "-":
-            return left - right
-        if op == "*":
-            return left * right
-        if op == "/":
-            return left / right
-        if op == "%":
-            if (not isinstance(left, (int, float)) or isinstance(left, bool)
-                    or not isinstance(right, (int, float)) or isinstance(right, bool)):
-                raise AdvPLRuntimeError("Operador '%' exige operandos numericos")
+            if isinstance(left, str) or isinstance(right, str):
+                hint = " Use cValToChar() para converter o número." if is_number(left) or is_number(right) else ""
+                raise AdvPLRuntimeError(
+                    f"Não é possível concatenar {advpl_type(left)} com {advpl_type(right)} "
+                    f"usando '+'.{hint}"
+                )
+            raise AdvPLRuntimeError(
+                f"Operador '+' exige dois numéricos ou dois caracteres; "
+                f"recebidos {advpl_type(left)} e {advpl_type(right)}"
+            )
+        if op in ("-", "*", "/", "%", "**"):
+            if not is_number(left) or not is_number(right):
+                raise AdvPLRuntimeError(
+                    f"Operador '{op}' exige operandos numericos; "
+                    f"recebidos {advpl_type(left)} e {advpl_type(right)}"
+                )
+            if op == "-":
+                return left - right
+            if op == "*":
+                return left * right
+            if op == "/":
+                if right == 0:
+                    raise AdvPLRuntimeError("Divisão por zero no operador '/'")
+                return left / right
             if right == 0:
-                raise AdvPLRuntimeError("Operador '%': modulo por zero")
-            return left % right
-        if op == "**":
+                if op == "%":
+                    raise AdvPLRuntimeError("Operador '%': modulo por zero")
+            if op == "%":
+                return left % right
             return left ** right
         if op == "==":
             return left == right
         if op == "<>":
             return left != right
-        if op == "<":
-            return left < right
-        if op == ">":
-            return left > right
-        if op == "<=":
-            return left <= right
-        if op == ">=":
-            return left >= right
+        if op in ("<", ">", "<=", ">="):
+            if not ((is_number(left) and is_number(right)) or
+                    (isinstance(left, str) and isinstance(right, str))):
+                raise AdvPLRuntimeError(
+                    f"Comparação '{op}' exige tipos compatíveis; "
+                    f"recebidos {advpl_type(left)} e {advpl_type(right)}"
+                )
+            return {"<": lambda: left < right, ">": lambda: left > right,
+                    "<=": lambda: left <= right, ">=": lambda: left >= right}[op]()
         raise AdvPLRuntimeError(f"Operador binário desconhecido: {op}")
 
     # --- biblioteca padrão mínima ---
     def _build_builtins(self):
         def b_len(args):
+            if not args or not isinstance(args[0], (str, list)):
+                received = advpl_type(args[0]) if args else "nenhum argumento"
+                raise AdvPLRuntimeError(
+                    f"Len: esperado caractere ou array; recebido {received}"
+                )
             v = args[0]
             return len(v)
 
@@ -481,12 +564,27 @@ class Interpreter:
             return s[start - 1: start - 1 + int(length)]
 
         def b_alltrim(args):
+            if not args or not isinstance(args[0], str):
+                received = advpl_type(args[0]) if args else "nenhum argumento"
+                raise AdvPLRuntimeError(
+                    f"AllTrim: esperado caractere; recebido {received}"
+                )
             return args[0].strip()
 
         def b_upper(args):
+            if not args or not isinstance(args[0], str):
+                received = advpl_type(args[0]) if args else "nenhum argumento"
+                raise AdvPLRuntimeError(
+                    f"Upper: esperado caractere; recebido {received}"
+                )
             return args[0].upper()
 
         def b_lower(args):
+            if not args or not isinstance(args[0], str):
+                received = advpl_type(args[0]) if args else "nenhum argumento"
+                raise AdvPLRuntimeError(
+                    f"Lower: esperado caractere; recebido {received}"
+                )
             return args[0].lower()
 
         def b_str(args):
@@ -532,6 +630,11 @@ class Interpreter:
             return s[:size].rjust(size)
 
         def b_aadd(args):
+            if len(args) < 2 or not isinstance(args[0], list):
+                received = advpl_type(args[0]) if args else "nenhum argumento"
+                raise AdvPLRuntimeError(
+                    f"AAdd: esperado array e valor; primeiro argumento é {received}"
+                )
             arr, value = args[0], args[1]
             arr.append(value)
             return value

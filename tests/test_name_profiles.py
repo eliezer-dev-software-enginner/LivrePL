@@ -1,5 +1,3 @@
-import contextlib
-import io
 import unittest
 from pathlib import Path
 
@@ -9,14 +7,10 @@ from naming import NameCollisionError
 
 
 class NameProfileTests(unittest.TestCase):
-    def test_cli_reports_legacy_collision_without_traceback(self):
+    def test_cli_raises_legacy_collision(self):
         source = Path(__file__).parent / "fixtures" / "name_collision.prw"
-        error = io.StringIO()
-        with contextlib.redirect_stderr(error):
-            code = main([str(source), "AtualizaCadastroCliente", "--name-profile", "legacy10"])
-        self.assertEqual(1, code)
-        self.assertIn("colidem", error.getvalue())
-        self.assertNotIn("Traceback", error.getvalue())
+        with self.assertRaisesRegex(NameCollisionError, "colidem"):
+            main([str(source), "AtualizaCadastroCliente", "--name-profile", "legacy10"])
 
     def test_modern_keeps_distinct_long_function_names(self):
         source = (

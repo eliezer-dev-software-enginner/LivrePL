@@ -39,7 +39,7 @@ arquivo.prw
 - Exceções internas do interpretador convertidas em objeto `ERROR` com `:Description`
 - `User Function` como prefixo opcional de `FUNCTION`
 - Operador `%` de modulo, com precedencia de multiplicacao/divisao; argumentos opcionais da entrada via `--args-json`.
-- `--arg` passa cada parametro como texto, sem exigir aspas JSON internas do shell; `Val()` rejeita valores nao textuais com erro AdvPL, sem traceback Python.
+- `--arg` passa cada parametro como texto, sem exigir aspas JSON internas do shell; `Val()` rejeita valores nao textuais com `AdvPLRuntimeError`.
 - `naming.py` centraliza os perfis de nomes: `modern` conserva o identificador completo; `legacy10` usa dez caracteres significativos e `U_` mais oito para funcoes de usuario, detectando colisoes de declaracoes.
 - 25 funções nativas: Len, SubStr, AllTrim, Upper, Lower, Str, CValToChar, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, IIf, Round, Int, Abs, Max, Min, Eval, UserException, Throw
 
@@ -51,6 +51,7 @@ arquivo.prw
 - Arrays AdvPL são 1-based
 - Não usar emojis em arquivos
 - Erros internos propagam como `AdvPLRuntimeError`
+- Erros comuns de expressao incluem linha de origem e tipos AdvPL; a CLI deixa a excecao propagar e o Python imprime traceback. Cobertura em `tests/test_runtime_diagnostics.py`.
 
 ## Rotina do assistente em uma correção nova
 

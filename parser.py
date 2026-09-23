@@ -163,6 +163,11 @@ class Parser:
         self.tokens = tokens
         self.pos = 0
 
+    @staticmethod
+    def located(node, line):
+        node.line = line
+        return node
+
     # --- utilidades ---
     def peek(self, offset=0):
         return self.tokens[self.pos + offset]
@@ -497,64 +502,64 @@ class Parser:
     def parse_or(self):
         left = self.parse_and()
         while self.at(TokenType.OR):
-            self.advance()
+            line = self.advance().line
             right = self.parse_and()
-            left = BinOp(left, "OR", right)
+            left = self.located(BinOp(left, "OR", right), line)
         return left
 
     def parse_and(self):
         left = self.parse_not()
         while self.at(TokenType.AND):
-            self.advance()
+            line = self.advance().line
             right = self.parse_not()
-            left = BinOp(left, "AND", right)
+            left = self.located(BinOp(left, "AND", right), line)
         return left
 
     def parse_not(self):
         if self.at(TokenType.NOT):
-            self.advance()
+            line = self.advance().line
             expr = self.parse_not()
-            return UnaryOp("NOT", expr)
+            return self.located(UnaryOp("NOT", expr), line)
         return self.parse_comparison()
 
     def parse_comparison(self):
         left = self.parse_additive()
         while self.at(TokenType.EQ, TokenType.NEQ, TokenType.LT,
                       TokenType.GT, TokenType.LTE, TokenType.GTE):
-            op = self.advance().value
+            token = self.advance()
             right = self.parse_additive()
-            left = BinOp(left, op, right)
+            left = self.located(BinOp(left, token.value, right), token.line)
         return left
 
     def parse_additive(self):
         left = self.parse_term()
         while self.at(TokenType.PLUS, TokenType.MINUS):
-            op = self.advance().value
+            token = self.advance()
             right = self.parse_term()
-            left = BinOp(left, op, right)
+            left = self.located(BinOp(left, token.value, right), token.line)
         return left
 
     def parse_term(self):
         left = self.parse_power()
         while self.at(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT):
-            op = self.advance().value
+            token = self.advance()
             right = self.parse_power()
-            left = BinOp(left, op, right)
+            left = self.located(BinOp(left, token.value, right), token.line)
         return left
 
     def parse_power(self):
         left = self.parse_unary()
         if self.at(TokenType.POWER):
-            self.advance()
+            line = self.advance().line
             right = self.parse_power()  # associatividade à direita
-            return BinOp(left, "**", right)
+            return self.located(BinOp(left, "**", right), line)
         return left
 
     def parse_unary(self):
         if self.at(TokenType.MINUS, TokenType.PLUS):
-            op = self.advance().value
+            token = self.advance()
             expr = self.parse_unary()
-            return UnaryOp(op, expr)
+            return self.located(UnaryOp(token.value, expr), token.line)
         return self.parse_postfix()
 
     def parse_postfix(self):
@@ -570,20 +575,20 @@ class Parser:
                         args.append(self.parse_expr())
                 self.expect(TokenType.RPAREN)
                 if isinstance(expr, Identifier):
-                    expr = Call(expr.name, args)
+                    expr = self.located(Call(expr.name, args), expr.line)
                 elif isinstance(expr, MemberAccess):
-                    expr = MethodCall(expr.target, expr.name, args)
+                    expr = self.located(MethodCall(expr.target, expr.name, args), expr.line)
                 else:
                     raise ParseError("Chamada inválida")
             elif self.at(TokenType.LBRACKET):
                 self.advance()
                 idx = self.parse_expr()
                 self.expect(TokenType.RBRACKET)
-                expr = Index(expr, idx)
+                expr = self.located(Index(expr, idx), expr.line)
             elif self.at(TokenType.COLON):
                 self.advance()
                 name = self.expect(TokenType.IDENTIFIER).value
-                expr = MemberAccess(expr, name)
+                expr = self.located(MemberAccess(expr, name), expr.line)
             else:
                 break
         return expr
@@ -593,23 +598,23 @@ class Parser:
 
         if tok.type == TokenType.NUMBER:
             self.advance()
-            return Literal(tok.value)
+            return self.located(Literal(tok.value), tok.line)
         if tok.type == TokenType.STRING:
             self.advance()
-            return Literal(tok.value)
+            return self.located(Literal(tok.value), tok.line)
         if tok.type == TokenType.LOGICAL:
             self.advance()
-            return Literal(tok.value)
+            return self.located(Literal(tok.value), tok.line)
         if tok.type == TokenType.NIL:
             self.advance()
-            return Literal(None)
+            return self.located(Literal(None), tok.line)
         if tok.type == TokenType.IDENTIFIER:
             self.advance()
-            return Identifier(tok.value)
+            return self.located(Identifier(tok.value), tok.line)
         if tok.type == TokenType.DCOLON:
             self.advance()
             name = self.expect(TokenType.IDENTIFIER).value
-            return MemberAccess(Identifier("SELF"), name)
+            return self.located(MemberAccess(self.located(Identifier("SELF"), tok.line), name), tok.line)
         if tok.type == TokenType.LPAREN:
             self.advance()
             expr = self.parse_expr()
@@ -618,7 +623,7 @@ class Parser:
         if tok.type == TokenType.LBRACE:
             self.advance()
             if self.at(TokenType.PIPE):
-                return self.parse_block_literal()
+                return self.located(self.parse_block_literal(), tok.line)
             elements = []
             if not self.at(TokenType.RBRACE):
                 elements.append(self.parse_expr())
@@ -626,7 +631,7 @@ class Parser:
                     self.advance()
                     elements.append(self.parse_expr())
             self.expect(TokenType.RBRACE)
-            return ArrayLiteral(elements)
+            return self.located(ArrayLiteral(elements), tok.line)
 
         raise ParseError(
             f"Token inesperado {tok.type} ({tok.value!r}) na linha {tok.line}"

@@ -12,10 +12,8 @@ import json
 import sys
 
 from preprocessor import preprocess
-from interpreter import run_source, Interpreter, AdvPLRuntimeError
-from parser import parse_source, dump, ParseError
-from lexer import LexError
-from naming import NameCollisionError
+from interpreter import run_source
+from parser import parse_source, dump
 
 
 def run_file(path: str, entry: str = "MAIN", args=None, dump_ast: bool = False,
@@ -92,12 +90,8 @@ def main(argv=None):
             print("[ERRO] --args-json exige um array JSON", file=sys.stderr)
             return 2
 
-    try:
-        run_file(path, entry=entry, args=entry_args, dump_ast=dump_ast,
-                 name_profile=name_profile)
-    except (ParseError, LexError, AdvPLRuntimeError, NameCollisionError) as e:
-        print(f"[ERRO] {e}", file=sys.stderr)
-        return 1
+    run_file(path, entry=entry, args=entry_args, dump_ast=dump_ast,
+             name_profile=name_profile)
 
     return 0
 
