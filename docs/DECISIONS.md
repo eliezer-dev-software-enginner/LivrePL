@@ -105,3 +105,9 @@ Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo 
 - O parser aceita lacunas em listas de argumentos de funcoes e metodos, inclusive quando ha comentario de bloco entre virgulas. Cada lacuna vira `Literal(None)` e mantem sua posicao.
 - Testes cobrem lacunas iniciais, intermediarias e finais, chamadas sem argumentos e preservacao de erro sintatico real.
 - Em `ZA1MVC.prw`, isso elimina o falso erro de sintaxe em `AddFields`; a verificacao seguinte encontra `oStruZA1` nao declarado, divergente do `oStruct` existente no proprio fonte.
+
+## 2026-09-25 — Localizacao de declaracoes na AST
+
+- `VarDecl` guarda a linha da palavra-chave (`LOCAL`, `STATIC`, `PRIVATE` ou `PUBLIC`), inclusive quando uma linha declara varias variaveis.
+- O parser do LivrePL continua aceitando declaracoes em qualquer posicao: a ordem estrita pedida pelo usuario e politica do AdvPL TestLab, nao regra universal da linguagem conforme a documentacao TOTVS.
+- Um teste proprio confirma a coordenada, sem depender do repositorio TestLab.

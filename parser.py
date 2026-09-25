@@ -303,14 +303,15 @@ class Parser:
         return self.parse_assign_or_call()
 
     def parse_vardecl(self):
-        kind = self.advance().type.name  # LOCAL/PRIVATE/PUBLIC/STATIC
+        keyword = self.advance()
+        kind = keyword.type.name  # LOCAL/PRIVATE/PUBLIC/STATIC
         decls = []
         name = self.expect(TokenType.IDENTIFIER).value
         expr = None
         if self.at(TokenType.ASSIGN):
             self.advance()
             expr = self.parse_expr()
-        decls.append(VarDecl(kind, name, expr))
+        decls.append(self.located(VarDecl(kind, name, expr), keyword.line))
         while self.at(TokenType.COMMA):
             self.advance()
             name = self.expect(TokenType.IDENTIFIER).value
@@ -318,7 +319,7 @@ class Parser:
             if self.at(TokenType.ASSIGN):
                 self.advance()
                 expr = self.parse_expr()
-            decls.append(VarDecl(kind, name, expr))
+            decls.append(self.located(VarDecl(kind, name, expr), keyword.line))
         # Se houver mais de uma declaração na mesma linha, devolvemos
         # uma lista "achatada" -- o interpretador trata VarDecl individualmente.
         if len(decls) == 1:
