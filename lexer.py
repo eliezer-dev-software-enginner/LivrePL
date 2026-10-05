@@ -70,6 +70,7 @@ class TokenType(Enum):
     STAR = auto()         # *
     SLASH = auto()        # /
     PERCENT = auto()      # %
+    CONTAINS = auto()
     POWER = auto()        # **
     PLUS_ASSIGN = auto()  # +=
     MINUS_ASSIGN = auto() # -=
@@ -201,6 +202,9 @@ class Lexer:
         if ch == ";":
             while self.peek() in " \t\r":
                 self.advance()
+            if self.peek() == "/" and self.peek(1) == "/":
+                while self.peek() not in ("\n", "\0"):
+                    self.advance()
             if self.peek() == "\n":
                 self.advance()
             return
@@ -309,6 +313,9 @@ class Lexer:
 
         if ch == "%":
             self.add_token(TokenType.PERCENT, "%")
+            return
+        if ch == "$":
+            self.add_token(TokenType.CONTAINS, "$")
             return
 
         if ch == "@":

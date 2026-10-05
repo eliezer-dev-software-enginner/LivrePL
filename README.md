@@ -13,19 +13,22 @@ Um interpretador tree-walking que executa scripts `.prw` de AdvPL diretamente no
 
 ## Funcionalidades
 
-- **Tipos**: Character, Numeric, Logical, Array, NIL, Block (code block)
+- **Tipos**: Character, Numeric, Logical, Date, Array, NIL, Block (code block), Object. Datas possuem tipo proprio, data vazia, comparacoes e calculos por dias.
 - **Controle de fluxo**: IF/ELSEIF/ELSE, FOR..TO..STEP/NEXT, DO WHILE/ENDDO, WHILE/ENDDO, DO CASE/OTHERWISE, BEGIN SEQUENCE/RECOVER (recupera tanto `UserException`/`Throw` quanto erros internos do interpretador)
 - **Escopo**: LOCAL, PRIVATE (dinamico pela pilha), PUBLIC, STATIC (persistente entre chamadas)
-- **Parametros por referencia**: `@variavel` em chamadas de funcoes e metodos do proprio `.prw` permite que o parametro altere a variavel de quem chamou. Sem `@`, escalares sao passados por valor. O operador nao e suportado em funcoes nativas do LivrePL.
+- **Parametros por referencia**: `@variavel` em chamadas de funcoes e metodos do proprio `.prw` permite que o parametro altere a variavel de quem chamou. Sem `@`, escalares sao passados por valor. Entre as nativas, `FreeObj(@objeto)` aceita referencia para limpar a variavel.
 - **Argumentos omitidos**: chamadas como `Funcao(1,,3)` e `oModel:AddFields('ID', /*cOwner*/, oStruct)` preservam a posicao vazia como `NIL`; comentarios entre virgulas nao viram argumentos.
 - **OOP**: CLASS/DATA/METHOD, heranca simples (FROM), SELF, ::attr, obj:Metodo()
 - **Code blocks**: `{|x,y| x+y}` com closure de leitura + Eval()
 - **Excecoes**: `UserException(cMsg)` cria um objeto `ERROR` com `:Description` e lanca; `Throw(valor)` lanca qualquer valor/objeto (inclusive classes de excecao do proprio usuario)
-- **25 funcoes nativas**: Len, Str, CValToChar, AllTrim, Upper, Lower, SubStr, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, IIf, Round, Int, Abs, Max, Min, Eval, UserException, Throw
+- **69 funcoes nativas**: texto, arrays, datas, conversoes, erros, saida de terminal e arquivos locais. Lista completa e limites em [biblioteca-padrao.md](docs/biblioteca-padrao.md).
+- **Datas e relogio**: `Date()` retorna a data do sistema com `ValType() == "D"`; `Time()` retorna `HH:MM:SS`. `CToD`/`DToC` usam `DD/MM/AAAA` por padrao; `SToD`/`DToS` usam `AAAAMMDD`.
+- **Busca em texto**: operador `$`, alem de `At` e `RAt`.
 - **Saida**: `?` (com quebra de linha) e `??` (nao quebra linha, concatena na mesma linha)
 - **Modulo**: `%` calcula o resto da divisao, com a mesma precedencia de `*` e `/`.
 - **Constante global `CRLF`**: `Chr(13)+Chr(10)` pre-definida como PUBLIC, disponivel em qualquer script (padrao do PROTHEUS.CH)
 - **Preprocessador basico**: `#define`, `#include` (no-op)
+- **Continuacao de linha**: `;` aceita comentario `//` antes da quebra de linha.
 
 ## Como testar
 
@@ -38,6 +41,7 @@ Um interpretador tree-walking que executa scripts `.prw` de AdvPL diretamente no
 ```bash
 python main.py exemplos/ola.prw
 python main.py exemplos/todas-etapas.prw
+python main.py exemplos/utilitarios.prw
 ```
 
 O nome da funcao de entrada pode diferir do nome do arquivo. Por exemplo, se `ex13b.prw` declara `User Function ex13()`, execute `python main.py ex13b.prw ex13`.

@@ -2,6 +2,21 @@
 
 Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo não é corrigido/alterado, apenas recebe entradas para ficar como histórico.
 
+## 2026-10-05 — Comentarios apos continuacao de linha
+
+- O lexer consome comentarios `//` depois de `;` antes de ignorar a quebra de linha. Isso desbloqueia as chamadas `AddField` do desafio1 sem alterar os fontes AdvPL.
+- Testes cobrem LF/CRLF, argumentos omitidos, comentario no fim do arquivo, numeracao de linhas e preservacao de comentarios comuns e strings.
+- Suite do LivrePL: 60 testes aprovados. A validacao do TRNSOL01 passa a reconhecer as 24 funcoes carregadas.
+
+## 2026-10-05 — Utilitarios da linguagem e datas tipadas
+
+- Migradas 21 funcoes gerais antes exclusivas do TestLab para `standard_library.py`; as integracoes de framework permanecem fora do core. O TestLab herda essas funcoes e conserva os overrides de relogio, arquivos e saida de Alert.
+- `advpl_date.py` representa datas vazias e validas como tipo D. Operacoes de soma/subtracao por dias e comparacoes passam pelo interpretador, com validacao de intervalo e tipos. ValType reconhece tambem B/O e CValToChar aceita datas.
+- Acrescentadas 23 funcoes depois de consultar o catalogo oficial da TOTVS e TDN; a biblioteca tem 69 nativas. O operador `$` e nativo, FreeObj aceita referencia e ErrorBlock invoca o handler nos erros de avaliacao.
+- `docs/biblioteca-padrao.md` registra inventario, fontes oficiais, cobertura e limites. `exemplos/utilitarios.prw` funciona diretamente no LivrePL.
+- A validacao inclui utilitarios independentes de TestLab, datas bissextas/vazias, arrays com ciclos, referencias, arquivos CP1252 reais, fixtures com data tipada e persistencia ISO sem alterar os JSON originais.
+- Resultado: 88 testes do LivrePL, 110 do TestLab e 33 de integracao aprovados. Os exemplos ola/todas-etapas/utilitarios, interpreter.py e TRNSOL01 pela CLI executaram sem erro.
+
 ## 2026-09-23
 
 ### Perfis de nomes da linguagem

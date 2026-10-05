@@ -11,6 +11,8 @@ from parser import (
     CaseStmt, SequenceStmt, BlockLiteral, MemberAccess, MethodCall,
 )
 from naming import NamePolicy
+from advpl_date import AdvPLDate
+from standard_library import build_utilities
 
 
 class AdvPLRuntimeError(Exception):
@@ -32,6 +34,8 @@ def advpl_type(value):
         return "numérico"
     if isinstance(value, str):
         return "caractere"
+    if isinstance(value, AdvPLDate):
+        return "data"
     if isinstance(value, list):
         return "array"
     return "objeto"
@@ -117,6 +121,11 @@ class Interpreter:
         self.globals["CRLF"] = "\r\n"  # constante padrão do PROTHEUS.CH
         self.statics = {}     # nome_funcao -> {nome_var: valor}
         self.call_stack = []  # lista de Frame
+        self.date_format = "%d/%m/%Y"
+        self._error_block = None
+        self._handling_error = False
+        self._open_files = set()
+        self._file_error = 0
         self.builtins = self._build_builtins()
 
     # --- ponto de entrada ---
@@ -266,7 +275,7 @@ class Interpreter:
             return result
 
         if upper in self.builtins:
-            if any(isinstance(arg, VariableReference) for arg in args):
+            if upper != "FREEOBJ" and any(isinstance(arg, VariableReference) for arg in args):
                 raise AdvPLRuntimeError(
                     f"Passagem por referência não suportada pela função nativa '{name}'"
                 )
@@ -472,6 +481,15 @@ class Interpreter:
         except AdvPLRuntimeError as error:
             if error.line is None:
                 error.line = getattr(node, "line", None)
+            if self._error_block is not None and not self._handling_error and not getattr(error, "handler_dispatched", False):
+                error.handler_dispatched = True
+                error_object = AdvPLObject("ERROR")
+                error_object.attrs["DESCRIPTION"] = str(error)
+                self._handling_error = True
+                try:
+                    self.invoke_block(self._error_block, [error_object])
+                finally:
+                    self._handling_error = False
             raise
 
     @staticmethod
@@ -562,6 +580,21 @@ class Interpreter:
         raise AdvPLRuntimeError(f"Nó de expressão não suportado: {type(node).__name__}")
 
     def apply_binop(self, op, left, right):
+        if op == "$":
+            if not isinstance(left, str) or not isinstance(right, str):
+                raise AdvPLRuntimeError("Operador '$' espera dois textos")
+            return left in right
+        if op in ("+", "-") and isinstance(left, AdvPLDate) and is_number(right):
+            if not float(right).is_integer():
+                raise AdvPLRuntimeError("Calculo com data exige numero inteiro de dias")
+            try:
+                return left.shift(int(right) if op == "+" else -int(right))
+            except (ValueError, OverflowError) as exc:
+                raise AdvPLRuntimeError("Data fora do intervalo suportado") from exc
+        if op == "+" and is_number(left) and isinstance(right, AdvPLDate):
+            return self.apply_binop(op, right, left)
+        if op == "-" and isinstance(left, AdvPLDate) and isinstance(right, AdvPLDate):
+            return left.ordinal - right.ordinal
         if op == "+":
             if isinstance(left, str) and isinstance(right, str):
                 return left + right
@@ -603,7 +636,8 @@ class Interpreter:
             return left != right
         if op in ("<", ">", "<=", ">="):
             if not ((is_number(left) and is_number(right)) or
-                    (isinstance(left, str) and isinstance(right, str))):
+                    (isinstance(left, str) and isinstance(right, str)) or
+                    (isinstance(left, AdvPLDate) and isinstance(right, AdvPLDate))):
                 raise AdvPLRuntimeError(
                     f"Comparação '{op}' exige tipos compatíveis; "
                     f"recebidos {advpl_type(left)} e {advpl_type(right)}"
@@ -663,6 +697,8 @@ class Interpreter:
 
         def b_cvaltochar(args):
             v = args[0]
+            if isinstance(v, AdvPLDate):
+                return self.builtins["DTOC"]([v])
             if v is None:
                 return ""
             if isinstance(v, bool):
@@ -720,6 +756,12 @@ class Interpreter:
 
         def b_valtype(args):
             v = args[0]
+            if isinstance(v, AdvPLDate):
+                return "D"
+            if isinstance(v, AdvPLBlock):
+                return "B"
+            if isinstance(v, AdvPLObject):
+                return "O"
             if v is None:
                 return "U"
             if isinstance(v, bool):
@@ -734,6 +776,8 @@ class Interpreter:
 
         def b_empty(args):
             v = args[0]
+            if isinstance(v, AdvPLDate):
+                return v.ordinal == 0
             if v is None:
                 return True
             if isinstance(v, (int, float)):
@@ -781,7 +825,7 @@ class Interpreter:
             value = args[0] if args else None
             raise ThrownException(value)
 
-        return {
+        builtins = {
             "LEN": b_len,
             "SUBSTR": b_substr,
             "ALLTRIM": b_alltrim,
@@ -808,6 +852,8 @@ class Interpreter:
             "USEREXCEPTION": b_userexception,
             "THROW": b_throw,
         }
+        builtins.update(build_utilities(self))
+        return builtins
 
 
 # ---------- helpers ----------

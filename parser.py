@@ -530,7 +530,7 @@ class Parser:
     def parse_comparison(self):
         left = self.parse_additive()
         while self.at(TokenType.EQ, TokenType.NEQ, TokenType.LT,
-                      TokenType.GT, TokenType.LTE, TokenType.GTE):
+                      TokenType.GT, TokenType.LTE, TokenType.GTE, TokenType.CONTAINS):
             token = self.advance()
             right = self.parse_additive()
             left = self.located(BinOp(left, token.value, right), token.line)

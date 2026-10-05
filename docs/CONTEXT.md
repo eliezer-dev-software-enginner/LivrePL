@@ -43,7 +43,7 @@ arquivo.prw
 - Operador `%` de modulo, com precedencia de multiplicacao/divisao; argumentos opcionais da entrada via `--args-json`.
 - `--arg` passa cada parametro como texto, sem exigir aspas JSON internas do shell; `Val()` rejeita valores nao textuais com `AdvPLRuntimeError`.
 - `naming.py` centraliza os perfis de nomes: `modern` conserva o identificador completo; `legacy10` usa dez caracteres significativos e `U_` mais oito para funcoes de usuario, detectando colisoes de declaracoes.
-- 25 funções nativas: Len, SubStr, AllTrim, Upper, Lower, Str, CValToChar, Val, Space, PadR, PadL, AAdd, ASize, ALen, ValType, Empty, IIf, Round, Int, Abs, Max, Min, Eval, UserException, Throw
+- 69 funcoes nativas, inventariadas em `docs/biblioteca-padrao.md`. `standard_library.py` centraliza os utilitarios independentes de Protheus; `advpl_date.py` implementa datas tipadas, inclusive vazias. O TestLab herda esses utilitarios e sobrescreve o relogio e os arquivos para manter os fixtures deterministas.
 
 ## Convenções de código
 
