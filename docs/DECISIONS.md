@@ -152,3 +152,8 @@ Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo 
 - Instalacao e primeiro programa executavel ficam no inicio, seguidos por exemplos, limites e FAQ.
 - Arquitetura, funcionalidades detalhadas, estrutura, AST, diagnosticos, perfis de nomes e execucao interna foram agrupados ao final em Aspectos tecnicos do interpretador.
 - Conteudo existente preservado, requisitos repetidos removidos e instrucoes de atualizacao simplificadas.
+
+## 2026-10-09 — Exemplos simples com parametros
+
+- README inclui utils.prw apos o primeiro programa, com Soma(x, y), conversao por Val(), Alert() e retorno numerico, alem de Saudacao(cSaudacao).
+- Comandos com --arg e saidas esperadas permitem testar as duas funcoes no terminal. Fonte disponivel em exemplos/utils.prw.

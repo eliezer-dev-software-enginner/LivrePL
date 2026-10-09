@@ -125,6 +125,49 @@ Ola, LivrePL!
 
 Voce nao precisa copiar o interpretador para essa pasta nem executar o comando dentro do repositorio LivrePL.
 
+### Funcoes com parametros
+
+Na mesma pasta, crie `utils.prw` com estas duas funcoes:
+
+```advpl
+User Function Soma(x, y)
+    Local nSoma := Val(x) + Val(y)
+    Alert("Soma: " + AllTrim(Str(nSoma)))
+Return nSoma
+
+User Function Saudacao(cSaudacao)
+    Alert(cSaudacao)
+Return cSaudacao
+```
+
+Para somar dois valores, execute:
+
+```bash
+livrepl utils.prw Soma --arg 5 --arg 3
+```
+
+Saida esperada:
+
+```text
+[ALERTA] Soma: 8
+```
+
+Cada `--arg` passa um parametro como texto; `Val()` converte os dois valores para numeros antes da soma. A funcao exibe o resultado com `Alert()` e retorna o valor numerico.
+
+Para passar uma saudacao, execute:
+
+```bash
+livrepl utils.prw Saudacao --arg "Bom dia!"
+```
+
+Saida esperada:
+
+```text
+[ALERTA] Bom dia!
+```
+
+As aspas mantem a saudacao inteira em um unico parametro. A funcao exibe e retorna o texto recebido. No LivrePL, `Alert()` escreve no terminal; o valor de `Return` nao e exibido automaticamente pela CLI.
+
 ### Atualizar ou desinstalar
 
 Se instalou a partir de um clone, execute `git pull` na pasta LivrePL para obter as atualizacoes. Se usou ZIP, baixe e extraia uma nova copia. Em seguida, execute `pipx install --force .` na pasta do codigo atualizado. O comando sozinho reinstala o codigo local; ele nao baixa atualizacoes do GitHub.
