@@ -19,3 +19,8 @@ exercicios/
 .idea/
 *.swp
 
+
+.venv/
+build/
+dist/
+*.egg-info/

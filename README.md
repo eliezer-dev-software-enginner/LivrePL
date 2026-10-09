@@ -30,11 +30,65 @@ Um interpretador tree-walking que executa scripts `.prw` de AdvPL diretamente no
 - **Preprocessador basico**: `#define`, `#include` (no-op)
 - **Continuacao de linha**: `;` aceita comentario `//` antes da quebra de linha.
 
+## Instalar e usar em qualquer diretorio
+
+O projeto agora e instalavel e cria o comando `livrepl`. A instalacao abaixo usa o checkout local; nao exige publicar no PyPI.
+
+### Instalacao com pipx
+
+Com Python 3.8+ e pipx disponiveis, execute **na pasta deste repositorio**:
+
+```bash
+pipx install .
+pipx ensurepath
+```
+
+Abra um novo terminal para carregar o PATH. Depois, em qualquer pasta com codigo AdvPL:
+
+```bash
+cd /caminho/dos/fontes
+livrepl arquivo.prw MinhaFuncao
+livrepl arquivo.prw MinhaFuncao --arg 5
+livrepl --ast arquivo.prw
+livrepl --help
+```
+
+No PowerShell:
+
+```powershell
+Set-Location C:\meus-fontes
+livrepl .\arquivo.prw MinhaFuncao --arg 5
+```
+
+Caminhos relativos do fonte e operacoes de arquivo AdvPL usam o diretorio atual do terminal. O comando nao muda para a pasta de instalacao. A entrada padrao continua MAIN; para User Function informe seu nome.
+
+Para desenvolver e refletir alteracoes do checkout: `pipx install --editable .`. Para atualizar uma instalacao normal, na pasta do repositorio: `pipx install --force .`. Para remover: `pipx uninstall livrepl`.
+
+### Alternativa: ambiente virtual
+
+Na pasta do repositorio, crie e instale em um ambiente virtual:
+
+```bash
+python -m venv .venv
+.venv/bin/python -m pip install .
+source .venv/bin/activate
+```
+
+No Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install .
+.\.venv\Scripts\Activate.ps1
+```
+
+Com o ambiente ativado, `livrepl` funciona de qualquer pasta. Tambem e possivel usar `python -m livrepl` com o Python desse ambiente. A execucao antiga `python main.py` continua funcionando no checkout.
+
 ## Como testar
 
 ### Requisitos
 
-- Python 3.6+
+- Python 3.8+
 
 ### Executar um script .prw
 

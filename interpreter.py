@@ -4,15 +4,26 @@
 # A etapa 4 adiciona: objetos (CLASS/METHOD com herança FROM), code blocks
 # ({|x,y| ...} com Eval()), DO CASE e BEGIN SEQUENCE/RECOVER.
 
-from parser import (
-    parse_source, Program, FunctionDecl, VarDecl, Assign, If, ForLoop,
-    WhileLoop, Return, PrintStmt, LoopStmt, ExitStmt, ExprStmt, BinOp,
-    UnaryOp, Literal, Identifier, ReferenceArg, ArrayLiteral, Index, Call,
-    CaseStmt, SequenceStmt, BlockLiteral, MemberAccess, MethodCall,
-)
-from naming import NamePolicy
-from advpl_date import AdvPLDate
-from standard_library import build_utilities
+if __package__:
+    from .parser import (
+        parse_source, Program, FunctionDecl, VarDecl, Assign, If, ForLoop,
+        WhileLoop, Return, PrintStmt, LoopStmt, ExitStmt, ExprStmt, BinOp,
+        UnaryOp, Literal, Identifier, ReferenceArg, ArrayLiteral, Index, Call,
+        CaseStmt, SequenceStmt, BlockLiteral, MemberAccess, MethodCall,
+    )
+    from .naming import NamePolicy
+    from .advpl_date import AdvPLDate
+    from .standard_library import build_utilities
+else:
+    from parser import (
+        parse_source, Program, FunctionDecl, VarDecl, Assign, If, ForLoop,
+        WhileLoop, Return, PrintStmt, LoopStmt, ExitStmt, ExprStmt, BinOp,
+        UnaryOp, Literal, Identifier, ReferenceArg, ArrayLiteral, Index, Call,
+        CaseStmt, SequenceStmt, BlockLiteral, MemberAccess, MethodCall,
+    )
+    from naming import NamePolicy
+    from advpl_date import AdvPLDate
+    from standard_library import build_utilities
 
 
 class AdvPLRuntimeError(Exception):

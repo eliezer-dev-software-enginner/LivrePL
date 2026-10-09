@@ -126,3 +126,11 @@ Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo 
 - `VarDecl` guarda a linha da palavra-chave (`LOCAL`, `STATIC`, `PRIVATE` ou `PUBLIC`), inclusive quando uma linha declara varias variaveis.
 - O parser do LivrePL continua aceitando declaracoes em qualquer posicao: a ordem estrita pedida pelo usuario e politica do AdvPL TestLab, nao regra universal da linguagem conforme a documentacao TOTVS.
 - Um teste proprio confirma a coordenada, sem depender do repositorio TestLab.
+
+## 2026-10-09 — Instalacao da CLI
+
+- pyproject.toml define o pacote livrepl e console script livrepl.main:main; __main__.py permite python -m livrepl. Sem dependencias de runtime.
+- Imports relativos quando executado como pacote evitam colisao com parser.py/main.py no diretorio dos fontes; imports antigos permanecem no modo script para compatibilidade com testes e consumidores existentes.
+- O comando preserva o diretorio de trabalho: fontes e I/O relativo do AdvPL continuam relativos ao terminal.
+- README documenta pipx, instalacao editavel, atualizacao/remocao e ambiente virtual em Linux/PowerShell. Requisito Python corrigido para 3.8+, compativel com o empacotamento.
+- --help/-h exibem a sintaxe do comando instalado. Artefatos de build e ambientes ficam ignorados pelo Git.

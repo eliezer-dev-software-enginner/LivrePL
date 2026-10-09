@@ -3,16 +3,28 @@ import os
 import re
 from datetime import date, datetime
 
-from advpl_date import AdvPLDate
+if __package__:
+    from .advpl_date import AdvPLDate
+else:
+    from advpl_date import AdvPLDate
 
 
 def build_utilities(runtime):
-    from interpreter import (
-        AdvPLBlock, AdvPLObject, AdvPLRuntimeError, VariableReference,
-        is_number, truthy, to_display,
-    )
-    from parser import ParseError, parse_source
-    from lexer import LexError
+    if __package__:
+        from .interpreter import (
+            AdvPLBlock, AdvPLObject, AdvPLRuntimeError, VariableReference,
+            is_number, truthy, to_display,
+        )
+        from .parser import ParseError, parse_source
+        from .lexer import LexError
+    else:
+        from interpreter import (
+            AdvPLBlock, AdvPLObject, AdvPLRuntimeError, VariableReference,
+            is_number, truthy, to_display,
+        )
+        from parser import ParseError, parse_source
+        from lexer import LexError
+
 
     def count(name, args, minimum, maximum=None):
         maximum = minimum if maximum is None else maximum

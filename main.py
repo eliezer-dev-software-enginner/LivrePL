@@ -11,9 +11,14 @@
 import json
 import sys
 
-from preprocessor import preprocess
-from interpreter import run_source
-from parser import parse_source, dump
+if __package__:
+    from .preprocessor import preprocess
+    from .interpreter import run_source
+    from .parser import parse_source, dump
+else:
+    from preprocessor import preprocess
+    from interpreter import run_source
+    from parser import parse_source, dump
 
 
 def run_file(path: str, entry: str = "MAIN", args=None, dump_ast: bool = False,
@@ -33,6 +38,11 @@ def run_file(path: str, entry: str = "MAIN", args=None, dump_ast: bool = False,
 
 def main(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
+
+    if argv in (["--help"], ["-h"]):
+        print("Uso: livrepl arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]")
+        print("Ex.: livrepl arquivo.prw Main")
+        return 0
 
     dump_ast = False
     name_profile = "modern"
@@ -68,8 +78,8 @@ def main(argv=None):
     argv = rest
 
     if not 1 <= len(argv) <= 2:
-        print("Uso: python main.py arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]")
-        print("Ex.: python main.py exemplos/todas-etapas.prw")
+        print("Uso: livrepl arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]")
+        print("Ex.: livrepl exemplos/todas-etapas.prw")
         return 2
 
     path = argv[0]

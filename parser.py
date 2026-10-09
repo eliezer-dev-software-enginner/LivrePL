@@ -6,7 +6,10 @@
 # "STATIC nVez := 0" (variável estática) via is_function_start/parse_function_body.
 # A etapa 4 adiciona DO CASE, BEGIN SEQUENCE, code blocks e CLASS/METHOD.
 
-from lexer import Lexer, TokenType
+if __package__:
+    from .lexer import Lexer, TokenType
+else:
+    from lexer import Lexer, TokenType
 
 
 class ParseError(Exception):

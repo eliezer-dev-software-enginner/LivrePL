@@ -1,4 +1,7 @@
-from parser import VarDecl
+if __package__:
+    from .parser import VarDecl
+else:
+    from parser import VarDecl
 
 
 class NameCollisionError(ValueError):
