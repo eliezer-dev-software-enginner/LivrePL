@@ -12,28 +12,27 @@ import json
 import sys
 
 if __package__:
-    from .preprocessor import preprocess
-    from .interpreter import run_source
-    from .parser import parse_source, dump
+    from .interpreter import Interpreter
+    from .source_loader import discover_source_units, compile_sources
+    from .parser import dump
 else:
-    from preprocessor import preprocess
-    from interpreter import run_source
-    from parser import parse_source, dump
+    from interpreter import Interpreter
+    from source_loader import discover_source_units, compile_sources
+    from parser import dump
 
 
 def run_file(path: str, entry: str = "MAIN", args=None, dump_ast: bool = False,
              name_profile: str = "modern"):
-    with open(path, encoding="utf-8", errors="replace") as f:
-        source = f.read()
-
-    source = preprocess(source)
-
+    program = compile_sources(discover_source_units(path), name_profile=name_profile)
+    interpreter = Interpreter(program, name_profile=name_profile)
     if dump_ast:
-        program = parse_source(source)
         dump(program)
+        for declarations in program.static_functions.values():
+            for declaration in declarations:
+                dump(declaration)
         return None
+    return interpreter.run(entry, args)
 
-    return run_source(source, entry=entry, args=args, name_profile=name_profile)
 
 
 def main(argv=None):

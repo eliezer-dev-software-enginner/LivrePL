@@ -77,8 +77,9 @@ class ThrownException(Exception):
 # ---------- Frame de execução (pilha de chamadas) ----------
 
 class Frame:
-    def __init__(self, func_name, self_obj=None):
-        self.func_name = func_name
+    def __init__(self, func_name, self_obj=None, source_path=None):
+        self.source_path = source_path
+        self.func_name = (source_path, func_name) if source_path is not None else func_name
         self.locals = {}    # LOCAL: só visível neste frame
         self.privates = {}  # PRIVATE: visível neste frame e nos frames filhos
         self.self_obj = self_obj  # objeto 'SELF', quando frame de um METHOD
@@ -124,6 +125,11 @@ class Interpreter:
             self.name_policy.user_symbol(f.name): f
             for f in program.functions if f.kind == "USER"
         }
+        self.entry_source = getattr(program, "entry_source", None)
+        self.static_functions = {
+            source: {self.name_policy.key(f.name): f for f in declarations}
+            for source, declarations in getattr(program, "static_functions", {}).items()
+        }
         self.classes = {self.name_policy.key(c.name): c for c in program.classes}
         self.methods = {}
         for m in program.methods:
@@ -142,7 +148,7 @@ class Interpreter:
     # --- ponto de entrada ---
     def run(self, entry="MAIN", args=None):
         key = self.name_policy.key(entry)
-        if key not in self.functions and key not in self.user_functions:
+        if key not in self.functions and key not in self.user_functions and key not in self.static_functions.get(self.entry_source, {}):
             raise AdvPLRuntimeError(f"Função de entrada '{entry}' não encontrada")
         return self.call_function(entry, args or [])
 
@@ -270,9 +276,11 @@ class Interpreter:
         upper = name.upper()
 
         key = self.name_policy.key(name)
-        decl = self.functions.get(key) or self.user_functions.get(key)
+        source = self.call_stack[-1].source_path if self.call_stack else self.entry_source
+        decl = (self.static_functions.get(source, {}).get(key)
+                or self.functions.get(key) or self.user_functions.get(key))
         if decl is not None:
-            frame = Frame(self.name_policy.key(decl.name))
+            frame = Frame(self.name_policy.key(decl.name), source_path=getattr(decl, "source_path", None))
             for i, param in enumerate(decl.params):
                 frame.locals[self.name_policy.key(param)] = args[i] if i < len(args) else None
             self.call_stack.append(frame)
@@ -325,7 +333,7 @@ class Interpreter:
             key = (cname, upper_method)
             if key in self.methods:
                 decl = self.methods[key]
-                frame = Frame(f"{cname}.{upper_method}", self_obj=obj)
+                frame = Frame(f"{cname}.{upper_method}", self_obj=obj, source_path=getattr(decl, "source_path", None))
                 for i, param in enumerate(decl.params):
                     frame.locals[self.name_policy.key(param)] = args[i] if i < len(args) else None
                 self.call_stack.append(frame)
@@ -343,7 +351,7 @@ class Interpreter:
 
     # --- code blocks (etapa 4) ---
     def invoke_block(self, block, args):
-        frame = Frame("(block)")
+        frame = Frame("(block)", source_path=block.captured_frame.source_path)
         frame.locals = dict(block.captured_frame.locals)  # closure de leitura
         for i, param in enumerate(block.params):
             frame.locals[self.name_policy.key(param)] = args[i] if i < len(args) else None

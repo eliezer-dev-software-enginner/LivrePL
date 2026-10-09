@@ -25,6 +25,7 @@ arquivo.prw
    -> interpreter.py    (Etapas 3+4: tree-walking executor)
 ```
 
+- `source_loader.py` — descoberta recursiva de //usePrw e compilacao por fonte com escopo STATIC.
 - `main.py` — CLI: `python main.py arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]`. Entry point padrão é `MAIN`.
 - `docs/` — documentação detalhada de cada etapa e dos adendos/correções.
 

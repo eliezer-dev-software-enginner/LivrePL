@@ -100,6 +100,36 @@ python main.py exemplos/utilitarios.prw
 
 O nome da funcao de entrada pode diferir do nome do arquivo. Por exemplo, se `ex13b.prw` declara `User Function ex13()`, execute `python main.py ex13b.prw ex13`.
 
+### Dependencias locais com usePrw
+
+O LivrePL carrega os fontes declarados em comentarios `//usePrw`, assim como o TestLab:
+
+```advpl
+//usePrw('auxiliar.prw')
+Function Main()
+    ? U_Dobro(5)
+Return NIL
+```
+
+Em `auxiliar.prw`:
+
+```advpl
+User Function Dobro(nValor)
+Return nValor * 2
+```
+
+Execute `livrepl principal.prw`: a saida e `10`. O mesmo carregamento funciona com `python main.py principal.prw` e `python -m livrepl principal.prw`.
+
+- Uma declaracao por linha; aspas simples ou duplas. O caminho e relativo ao arquivo que declara a dependencia.
+- Subpastas sao permitidas; dependencias devem permanecer dentro da pasta do fonte principal, como no TestLab.
+- Dependencias recursivas, repetidas ou circulares sao carregadas uma unica vez por caminho resolvido.
+- Arquivos ausentes, extensoes diferentes de `.prw` e caminhos fora da pasta principal geram erro com identificacao do fonte.
+- Funcoes publicas e classes dos fontes carregados ficam disponiveis; User Function aceita o simbolo `U_...`. Static Function fica acessivel apenas ao proprio fonte, inclusive em code blocks e metodos definidos nele.
+- Funcoes estaticas de arquivos diferentes podem ter o mesmo nome; seu estado STATIC permanece separado. Colisoes publicas sao rejeitadas segundo o perfil modern/legacy10.
+- `--ast` mostra as declaracoes de todos os fontes carregados. UTF-8 (com ou sem BOM) e CP1252 sao aceitos.
+
+`//usePrw` e uma convencao local, nao uma funcao AdvPL nem um substituto para `#include`. O preprocessamento de includes continua com os limites documentados. Para usar a mudanca numa instalacao normal, reinstale com `pipx install --force .` na pasta do LivrePL.
+
 ### Ver a AST gerada
 
 ```bash

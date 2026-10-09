@@ -134,3 +134,10 @@ Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo 
 - O comando preserva o diretorio de trabalho: fontes e I/O relativo do AdvPL continuam relativos ao terminal.
 - README documenta pipx, instalacao editavel, atualizacao/remocao e ambiente virtual em Linux/PowerShell. Requisito Python corrigido para 3.8+, compativel com o empacotamento.
 - --help/-h exibem a sintaxe do comando instalado. Artefatos de build e ambientes ficam ignorados pelo Git.
+
+## 2026-10-09 — Dependencias usePrw no LivrePL
+
+- source_loader.py descobre comentarios usePrw fora de strings/comentarios de bloco, resolve dependencias relativas recursivas e deduplica caminhos. A pasta principal delimita os fontes, seguindo o TestLab. Leitura aceita UTF-8-sig e CP1252.
+- CLI compila cada unidade separadamente, preprocessa e combina funcoes publicas/classes/metodos. AST tambem inclui dependencias. Erros de parser e nomes preservam o tipo original e recebem o caminho de origem.
+- Interpreter resolve Static Function pelo fonte do frame, propaga origem a metodos/code blocks e separa buckets de variaveis STATIC. run_source em memoria permanece compativel.
+- Adicionados nove testes para recursao, deduplicacao/ciclos, escopo/estado STATIC, callbacks, falhas de caminhos, colisoes, comentarios e codificacoes. README documenta uso e reinstalacao.
