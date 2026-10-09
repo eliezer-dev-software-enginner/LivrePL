@@ -141,3 +141,14 @@ Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo 
 - CLI compila cada unidade separadamente, preprocessa e combina funcoes publicas/classes/metodos. AST tambem inclui dependencias. Erros de parser e nomes preservam o tipo original e recebem o caminho de origem.
 - Interpreter resolve Static Function pelo fonte do frame, propaga origem a metodos/code blocks e separa buckets de variaveis STATIC. run_source em memoria permanece compativel.
 - Adicionados nove testes para recursao, deduplicacao/ciclos, escopo/estado STATIC, callbacks, falhas de caminhos, colisoes, comentarios e codificacoes. README documenta uso e reinstalacao.
+
+## 2026-10-09 — Guia de instalacao completo
+
+- README explica requisitos, clonagem por HTTPS ou download/extracao de ZIP e como localizar a pasta com pyproject.toml antes de instalar.
+- Inclui preparacao de pipx em Ubuntu/Debian e Windows, PATH, uso fora do repositorio, significado de install ., atualizacao do codigo antes de reinstalar e alternativa venv sem ativacao no PowerShell.
+
+## 2026-10-09 — Ordem do README
+
+- Instalacao e primeiro programa executavel ficam no inicio, seguidos por exemplos, limites e FAQ.
+- Arquitetura, funcionalidades detalhadas, estrutura, AST, diagnosticos, perfis de nomes e execucao interna foram agrupados ao final em Aspectos tecnicos do interpretador.
+- Conteudo existente preservado, requisitos repetidos removidos e instrucoes de atualizacao simplificadas.
