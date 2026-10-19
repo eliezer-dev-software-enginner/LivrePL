@@ -1,4 +1,4 @@
-# Interpretador AdvPL (Sem Licenca)
+# LivrePL — interpretador AdvPL sem AppServer
 
 Interpretador/executor de codigo AdvPL (linguagem do Protheus/TOTVS) feito em Python, sem necessidade de AppServer, licenca ou banco de dados.
 
@@ -206,7 +206,7 @@ python main.py exemplos/todas-etapas.prw
 python main.py exemplos/utilitarios.prw
 ```
 
-O nome da funcao de entrada pode diferir do nome do arquivo. Por exemplo, se `ex13b.prw` declara `User Function ex13()`, execute `python main.py ex13b.prw ex13`.
+O nome da funcao de entrada pode diferir do nome do arquivo. Por exemplo, para executar `User Function Soma(x, y)` no arquivo `utils.prw` criado acima, use `python main.py utils.prw Soma --arg 5 --arg 3`.
 
 ### Dependencias locais com usePrw
 
@@ -244,19 +244,19 @@ Execute `livrepl principal.prw`: a saida e `10`. O mesmo carregamento funciona c
 python main.py arquivo.prw NOMEFUNC
 ```
 
-Para passar argumentos à função de entrada, informe um array JSON em `--args-json`. Por exemplo, no PowerShell, a partir de `caminho-protheus`:
+Para passar argumentos à função de entrada, informe um array JSON em `--args-json`. Com o arquivo `utils.prw` do exemplo anterior, execute na pasta em que ele foi salvo:
 
-```powershell
-python ..\livrePL\main.py .\Fontes\exercicios-sintaxe\nivel1\ex5.prw ex5 --args-json '["5"]'
+```bash
+livrepl utils.prw Soma --args-json '["5", "3"]'
 ```
 
 Algumas configurações do Windows PowerShell removem as aspas internas antes de entregar o JSON ao Python. Para passar texto sem depender desse tratamento de aspas, prefira `--arg` (repita a opção para vários parâmetros):
 
 ```powershell
-python ..\livrePL\main.py .\Fontes\exercicios-sintaxe\nivel1\ex5.prw ex5 --arg 5
+livrepl utils.prw Soma --arg 5 --arg 3
 ```
 
-O resultado é `eh impar`. Use `--arg 4` para testar o caminho par. `--args-json` continua disponível quando o tipo do argumento importa; `--arg` e `--args-json` não podem ser combinados. Sem argumentos, a chamada mantém o comportamento anterior: cada parâmetro ausente recebe `NIL`. `Val()` exige texto e informa um erro AdvPL quando recebe outro tipo.
+A saida dos dois comandos e `[ALERTA] Soma: 8`. `--args-json` continua disponivel quando o tipo do argumento importa; `--arg` e `--args-json` nao podem ser combinados. Sem argumentos, cada parametro ausente recebe `NIL`. `Val()` exige texto e informa um erro AdvPL quando recebe outro tipo.
 
 ### Testar um User Function
 
@@ -357,7 +357,10 @@ Fora do escopo (por design): banco de dados (DBUseArea, SX3, alias), MVC (FWMBro
 Para estudantes e analistas de sistemas que querem testar trechos de codigo AdvPL rapidamente, sem depender de um ambiente Protheus completo - nem sempre acessivel fora do trabalho. Ideal para estudar a sintaxe da linguagem, treinar logica de programacao em AdvPL, ou rodar scripts isolados (algoritmos, manipulacao de string/array, OOP basico). Nao substitui o Protheus para nada que dependa de banco de dados, dicionario de dados (SX3) ou MVC.
 
 **Infringe os termos de uso do Protheus?**
-Nao. Este projeto nao usa, nao distribui e nao faz engenharia reversa de nenhum binario da TOTVS (AppServer, compilador, etc.) - e um interpretador escrito do zero em Python que reconhece a *sintaxe* da linguagem AdvPL, sem nenhum codigo proprietario da TOTVS envolvido. Ele nao tem qualquer pretensao comercial, e nao recria o framework Protheus (SX3, MVC, REST, licenciamento) - so a linguagem "pura". Ainda assim, isto nao e uma opiniao juridica; se voce pretende usar isso em contexto corporativo, vale validar com sua empresa.
+O repositorio contem uma implementacao em Python para executar parte da linguagem AdvPL, sem distribuir AppServer ou compilador. A compatibilidade com termos de uso da TOTVS depende do contexto de utilizacao; este README nao oferece avaliacao juridica. Para uso corporativo, consulte as regras aplicaveis na sua empresa.
+
+**Qual e a licenca do LivrePL?**
+O repositorio nao inclui um arquivo de licenca nem declara uma licenca para o codigo. A definicao de uma licenca depende de decisao do responsavel pelo projeto. "Sem licenca" na descricao do interpretador refere-se a executar os exemplos sem licenca de AppServer, e nao a permissao de reutilizar o codigo deste repositorio.
 
 **O que e AST?**
 AST (*Abstract Syntax Tree*, ou Arvore Sintatica Abstrata) e a representacao estruturada do codigo depois que ele passa pela analise gramatical - cada lacos, condicional, operacao e chamada de funcao vira um "no" em uma arvore, em vez de continuar sendo texto solto. E essa arvore que o interpretador percorre para executar o programa (por isso o termo *tree-walking interpreter*). Rode `python main.py --ast arquivo.prw` para ver a AST de um script seu.
