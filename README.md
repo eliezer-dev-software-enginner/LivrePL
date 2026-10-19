@@ -262,13 +262,18 @@ A saida dos dois comandos e `[ALERTA] Soma: 8`. `--args-json` continua disponive
 
 Scripts AdvPL costumam declarar o ponto de entrada como `User Function`, nao como `Function Main()`. O interpretador aceita as duas formas — para executar um `User Function`, passe o nome da funcao como entry point:
 
-```bash
-# ola.prw:
+Crie um arquivo `ola.prw` com este conteudo:
+
+```advpl
 User Function ola()
     Local cNome := "Dev"
     ? cNome
 Return(Nil)
+```
 
+Execute na pasta em que salvou o arquivo:
+
+```bash
 python main.py ola.prw ola
 ```
 
@@ -412,13 +417,17 @@ Um interpretador tree-walking que executa scripts `.prw` de AdvPL diretamente no
 ```
 .
 ├── main.py            # CLI: python main.py arquivo.prw
+├── pyproject.toml     # pacote Python e comando livrepl
 ├── preprocessor.py    # #define / #include (roda antes do lexer)
+├── source_loader.py   # carrega o fonte principal e dependencias usePrw
 ├── lexer.py           # Etapa 1: tokenizador
 ├── parser.py          # Etapa 2: parser recursivo -> AST
 ├── interpreter.py     # Etapa 3+4: tree-walking executor
+├── standard_library.py # funcoes nativas
 ├── exemplos/
 │   ├── ola.prw        # FOR, IF, PRIVATE, nativas basicas
-│   └── todas-etapas.prw  # DO CASE, code blocks, CLASS/METHOD
+│   ├── todas-etapas.prw  # DO CASE, code blocks, CLASS/METHOD
+│   └── utilitarios.prw # funcoes de data, texto e arrays
 └── docs/              # Documentacao detalhada por etapa
 ```
 
