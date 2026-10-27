@@ -206,7 +206,7 @@ python main.py exemplos/todas-etapas.prw
 python main.py exemplos/utilitarios.prw
 ```
 
-O nome da funcao de entrada pode diferir do nome do arquivo. Por exemplo, para executar `User Function Soma(x, y)` no arquivo `utils.prw` criado acima, use `python main.py utils.prw Soma --arg 5 --arg 3`.
+O nome da funcao de entrada pode diferir do nome do arquivo. Por exemplo, na pasta em que salvou o `utils.prw` criado acima, use `livrepl utils.prw Soma --arg 5 --arg 3`. Para usar `python main.py`, execute-o na raiz do checkout e informe o caminho do fonte.
 
 ### Dependencias locais com usePrw
 
@@ -226,7 +226,7 @@ User Function Dobro(nValor)
 Return nValor * 2
 ```
 
-Execute `livrepl principal.prw`: a saida e `10`. O mesmo carregamento funciona com `python main.py principal.prw` e `python -m livrepl principal.prw`.
+Execute `livrepl principal.prw`: a saida e `10`. O mesmo carregamento funciona com `python main.py principal.prw` na raiz do checkout (se os arquivos estiverem nela) e `python -m livrepl principal.prw` no ambiente em que o pacote foi instalado.
 
 - Uma declaracao por linha; aspas simples ou duplas. O caminho e relativo ao arquivo que declara a dependencia.
 - Subpastas sao permitidas; dependencias devem permanecer dentro da pasta do fonte principal, como no TestLab.
@@ -241,7 +241,7 @@ Execute `livrepl principal.prw`: a saida e `10`. O mesmo carregamento funciona c
 ### Executar um modulo especifico (com entry point diferente)
 
 ```bash
-python main.py arquivo.prw NOMEFUNC
+livrepl arquivo.prw NOMEFUNC
 ```
 
 Para passar argumentos à função de entrada, informe um array JSON em `--args-json`. Com o arquivo `utils.prw` do exemplo anterior, execute na pasta em que ele foi salvo:
@@ -274,7 +274,7 @@ Return(Nil)
 Execute na pasta em que salvou o arquivo:
 
 ```bash
-python main.py ola.prw ola
+livrepl ola.prw ola
 ```
 
 Saida:
@@ -295,7 +295,7 @@ Function Main()
 Return NIL
 EOF
 
-python main.py teste.prw
+livrepl teste.prw
 ```
 
 Saida:
@@ -368,7 +368,7 @@ O repositorio contem uma implementacao em Python para executar parte da linguage
 O repositorio nao inclui um arquivo de licenca nem declara uma licenca para o codigo. A definicao de uma licenca depende de decisao do responsavel pelo projeto. "Sem licenca" na descricao do interpretador refere-se a executar os exemplos sem licenca de AppServer, e nao a permissao de reutilizar o codigo deste repositorio.
 
 **O que e AST?**
-AST (*Abstract Syntax Tree*, ou Arvore Sintatica Abstrata) e a representacao estruturada do codigo depois que ele passa pela analise gramatical - cada lacos, condicional, operacao e chamada de funcao vira um "no" em uma arvore, em vez de continuar sendo texto solto. E essa arvore que o interpretador percorre para executar o programa (por isso o termo *tree-walking interpreter*). Rode `python main.py --ast arquivo.prw` para ver a AST de um script seu.
+AST (*Abstract Syntax Tree*, ou Arvore Sintatica Abstrata) e a representacao estruturada do codigo depois que ele passa pela analise gramatical - cada lacos, condicional, operacao e chamada de funcao vira um "no" em uma arvore, em vez de continuar sendo texto solto. E essa arvore que o interpretador percorre para executar o programa (por isso o termo *tree-walking interpreter*). Rode `livrepl --ast arquivo.prw` na pasta do seu script para ver a AST.
 
 **Meu codigo .prw real do trabalho roda aqui?**
 So se ele for "AdvPL puro" - sem `DBUseArea`, sem classes do framework (`FWMBrowse`, `ModelDef`), sem `WSRESTFUL`, sem Pontos de Entrada. Um `.prw` que ja depende do dicionario de dados (SX3) ou de banco nao vai rodar, porque esse ecossistema nao foi (e nao esta previsto para ser) recriado aqui - ver secao "Limitacoes".
