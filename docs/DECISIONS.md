@@ -157,3 +157,11 @@ Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo 
 
 - README inclui utils.prw apos o primeiro programa, com Soma(x, y), conversao por Val(), Alert() e retorno numerico, alem de Saudacao(cSaudacao).
 - Comandos com --arg e saidas esperadas permitem testar as duas funcoes no terminal. Fonte disponivel em exemplos/utils.prw.
+
+## 2026-11-05 — CI, skill e politica de documentacao
+
+- Pull requests executam a suite propria em Python 3.8 e 3.12, instalando o pacote em modo editavel em um runner limpo.
+- `.agents/skills/livrepl/SKILL.md` distingue a base da linguagem dos recursos Protheus que pertencem ao AdvPLab; `AGENTS.md` torna a orientacao descobrivel no checkout.
+- Mudancas novas atualizam `docs/`. O README fica concentrado em instalacao, uso, capacidades e limites publicos; detalhes de implementacao e conteudo local da maquina ficam na documentacao interna.
+- O relato de construcao foi movido do README para `docs/project-history.md`.
+- Validacao local: skill aprovada pelo validador do Codex, workflow lido como YAML, instalacao editavel limpa e 98 testes aprovados. Python 3.8 sera exercitado pelo runner porque a maquina local possui somente Python 3.12.

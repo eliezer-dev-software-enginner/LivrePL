@@ -28,6 +28,8 @@ arquivo.prw
 - `source_loader.py` — descoberta recursiva de //usePrw e compilacao por fonte com escopo STATIC.
 - `main.py` — CLI: `python main.py arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]`. Entry point padrão é `MAIN`.
 - `docs/` — documentação detalhada de cada etapa e dos adendos/correções.
+- `.github/workflows/pull-request.yml` — testes de pull request em Python 3.8 e 3.12.
+- `.agents/skills/livrepl/SKILL.md` — orientacao reutilizavel para agentes que alteram a linguagem.
 
 ## Funcionalidades implementadas
 
@@ -72,3 +74,11 @@ Quando chega um novo arquivo `.md` em `docs/` descrevendo uma correção/etapa:
 ## Formatação de texto
 
 O usuário escreve sem acentos. Manter o mesmo estilo nos arquivos (sem acentos) a menos que seja necessário.
+
+## Documentacao e contribuicao
+
+Toda mudanca nova deve atualizar a documentacao pertinente em `docs/`. `CONTEXT.md` consolida o estado atual, `DECISIONS.md` registra decisoes duradouras e documentos tecnicos explicam desenho, compatibilidade e limites.
+
+O README permanece a entrada publica e portatil para instalacao e uso. Historico de implementacao, caminhos absolutos, arquivos locais, configuracao da maquina e notas de sessao ficam em `docs/`, `AGENTS.md` ou `docs/contributing.md`.
+
+Pull requests executam a suite em Python 3.8 e 3.12 sem depender do ambiente local. A skill do projeto pode ser instalada a partir de `.agents/skills/livrepl/SKILL.md`; os comandos estao em `docs/contributing.md`.

@@ -475,10 +475,5 @@ Documentacao detalhada de cada etapa esta em `docs/`:
 - `interpretador-advpl-04f-next-com-variavel.md` - correcao: `NEXT x` (variavel opcional apos NEXT)
 - `CONTEXT.md` - contexto do projeto e rotina de trabalho
 - `DECISIONS.md` - registro de modificacoes
-
-### Como foi construido
-
-O projeto foi idealizado e conduzido por **Eliezer Dev** ([GitHub](https://github.com/eliezer-dev-software-enginner)), que definiu o escopo, validou cada etapa e decidiu as proximas construcoes da linguagem a implementar.
-
-- **Claude Code (modelo Claude Sonnet 5, esforco Medium)** foi usado para o levantamento de requisitos e para desenhar a arquitetura do interpretador (lexer -> parser/AST -> tree-walking interpreter) em conversa iterativa, etapa por etapa. Tambem gerou toda a documentacao tecnica em Markdown presente em `docs/` - incluindo o escopo inicial (v1), o design de cada etapa (lexer, parser, interpretador, OOP/excecoes) e os trechos de codigo Python correspondentes, sempre testando cada peca antes de documentar a saida real.
-- **OpenCode** foi usado para traduzir os trechos de codigo Python presentes nos documentos Markdown de `docs/` nas implementacoes de fato do projeto (`lexer.py`, `parser.py`, `interpreter.py`, etc.), integrando tudo em uma base de codigo coesa e executavel.
+- `contributing.md` - workflow de pull request, skill do LivrePL e politica de documentacao
+- `project-history.md` - historico de construcao do projeto
