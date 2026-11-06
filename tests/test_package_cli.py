@@ -32,3 +32,27 @@ class PackageCliTests(unittest.TestCase):
                                     capture_output=True, text=True)
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertEqual("Ola Dev\n", result.stdout)
+
+    def test_run_alias_executes_source_inside_subdirectory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            cwd = Path(folder)
+            fontes = cwd / "Fontes"
+            fontes.mkdir()
+            (fontes / "Utils.prw").write_text(
+                'User Function Soma(cValor)\n? Val(cValor) + 1\nReturn NIL\n',
+                encoding="utf-8",
+            )
+            code = (
+                "import importlib.util, sys; "
+                "from pathlib import Path; "
+                "root=Path(sys.argv[1]); "
+                "spec=importlib.util.spec_from_file_location('livrepl', root/'__init__.py', submodule_search_locations=[str(root)]); "
+                "module=importlib.util.module_from_spec(spec); "
+                "sys.modules['livrepl']=module; spec.loader.exec_module(module); "
+                "from livrepl.main import main; "
+                "raise SystemExit(main(['--run','Fontes/Utils.prw','Soma','--arg','2']))"
+            )
+            result = subprocess.run([sys.executable, "-c", code, str(ROOT)], cwd=cwd,
+                                    capture_output=True, text=True)
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertEqual("3\n", result.stdout)

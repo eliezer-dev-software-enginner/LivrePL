@@ -165,3 +165,9 @@ Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo 
 - Mudancas novas atualizam `docs/`. O README fica concentrado em instalacao, uso, capacidades e limites publicos; detalhes de implementacao e conteudo local da maquina ficam na documentacao interna.
 - O relato de construcao foi movido do README para `docs/project-history.md`.
 - Validacao local: skill aprovada pelo validador do Codex, workflow lido como YAML, instalacao editavel limpa e 98 testes aprovados. Python 3.8 sera exercitado pelo runner porque a maquina local possui somente Python 3.12.
+
+## 2026-11-06 — Alias --run e fontes em subdiretorios
+
+- A CLI aceita `livrepl --run Fontes/Utils.prw Soma --arg 2`, alem da forma posicional historica sem `--run`.
+- `--run` e somente um alias de interface: o carregador continua resolvendo o caminho informado e dependencias `usePrw` a partir do fonte principal.
+- Um teste de processo executa um PRW criado em `Fontes/` com funcao posicional e argumento textual.

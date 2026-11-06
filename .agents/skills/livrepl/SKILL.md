@@ -15,6 +15,8 @@ Não adicione aqui banco simulado, SX3, aliases Protheus, MVC, FWBrowse, fixture
 
 ## Fluxo de trabalho
 
+Ao reproduzir chamadas da CLI, aceite as formas equivalentes `livrepl arquivo.prw Funcao` e `livrepl --run arquivo.prw Funcao`. Preserve caminhos relativos com subdiretorios e use `--arg` para texto ou `--args-json` para valores tipados.
+
 1. Leia `docs/CONTEXT.md`, `docs/DECISIONS.md` e o documento técnico relacionado.
 2. Reproduza a sintaxe ou o comportamento com o menor fonte `.prw` possível.
 3. Preserve nomes case-insensitive, arrays 1-based, escopo dinâmico de `PRIVATE`, isolamento de `LOCAL` e persistência de `STATIC`.

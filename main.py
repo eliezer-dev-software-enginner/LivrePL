@@ -38,8 +38,11 @@ def run_file(path: str, entry: str = "MAIN", args=None, dump_ast: bool = False,
 def main(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
 
+    if argv and argv[0] in ("-run", "--run"):
+        argv = argv[1:]
+
     if argv in (["--help"], ["-h"]):
-        print("Uso: livrepl arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]")
+        print("Uso: livrepl [--run] arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]")
         print("Ex.: livrepl arquivo.prw Main")
         return 0
 
@@ -77,7 +80,7 @@ def main(argv=None):
     argv = rest
 
     if not 1 <= len(argv) <= 2:
-        print("Uso: livrepl arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]")
+        print("Uso: livrepl [--run] arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]")
         print("Ex.: livrepl exemplos/todas-etapas.prw")
         return 2
 

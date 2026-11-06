@@ -88,6 +88,7 @@ Abra um novo terminal para carregar o PATH. Confira `livrepl --help`. Depois, en
 cd /caminho/dos/fontes
 livrepl arquivo.prw MinhaFuncao
 livrepl arquivo.prw MinhaFuncao --arg 5
+livrepl --run Fontes/Utils.prw Soma --arg 2 --arg 3
 livrepl --ast arquivo.prw
 livrepl --help
 ```
@@ -99,7 +100,7 @@ Set-Location C:\meus-fontes
 livrepl .\arquivo.prw MinhaFuncao --arg 5
 ```
 
-Caminhos relativos do fonte e operacoes de arquivo AdvPL usam o diretorio atual do terminal. O comando nao muda para a pasta de instalacao. A entrada padrao continua MAIN; para User Function informe seu nome.
+Caminhos relativos do fonte, inclusive em subdiretorios, e operacoes de arquivo AdvPL usam o diretorio atual do terminal. O comando nao muda para a pasta de instalacao. `--run` e um alias opcional compativel com o AdvPLab. A entrada padrao continua MAIN; para User Function informe seu nome.
 
 ### Primeiro programa
 
@@ -206,7 +207,7 @@ python main.py exemplos/todas-etapas.prw
 python main.py exemplos/utilitarios.prw
 ```
 
-O nome da funcao de entrada pode diferir do nome do arquivo. Por exemplo, na pasta em que salvou o `utils.prw` criado acima, use `livrepl utils.prw Soma --arg 5 --arg 3`. Para usar `python main.py`, execute-o na raiz do checkout e informe o caminho do fonte.
+O nome da funcao de entrada pode diferir do nome do arquivo. Por exemplo, na pasta em que salvou o `utils.prw` criado acima, use `livrepl utils.prw Soma --arg 5 --arg 3`. A forma equivalente `livrepl --run Fontes/Utils.prw Soma --arg 5 --arg 3` aceita o fonte em um subdiretorio. Para usar `python main.py`, execute-o na raiz do checkout e informe o caminho do fonte.
 
 ### Dependencias locais com usePrw
 

@@ -26,7 +26,7 @@ arquivo.prw
 ```
 
 - `source_loader.py` — descoberta recursiva de //usePrw e compilacao por fonte com escopo STATIC.
-- `main.py` — CLI: `python main.py arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]`. Entry point padrão é `MAIN`.
+- `main.py` — CLI: `livrepl [--run] arquivo.prw [FuncaoDeEntrada] [--arg TEXTO ... | --args-json '[...]'] [--name-profile modern|legacy10] [--ast]`. `--run` e um alias opcional compativel com o AdvPLab; caminhos em subdiretorios sao aceitos. Entry point padrao e `MAIN`.
 - `docs/` — documentação detalhada de cada etapa e dos adendos/correções.
 - `.github/workflows/pull-request.yml` — testes de pull request em Python 3.8 e 3.12.
 - `.agents/skills/livrepl/SKILL.md` — orientacao reutilizavel para agentes que alteram a linguagem.
