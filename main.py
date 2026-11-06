@@ -12,13 +12,19 @@ import json
 import sys
 
 if __package__:
-    from .interpreter import Interpreter
-    from .source_loader import discover_source_units, compile_sources
-    from .parser import dump
+    from .diagnostics import print_diagnostic
+    from .interpreter import AdvPLRuntimeError, Interpreter
+    from .lexer import LexError
+    from .naming import NameCollisionError
+    from .source_loader import SourceLoadError, discover_source_units, compile_sources
+    from .parser import ParseError, dump
 else:
-    from interpreter import Interpreter
-    from source_loader import discover_source_units, compile_sources
-    from parser import dump
+    from diagnostics import print_diagnostic
+    from interpreter import AdvPLRuntimeError, Interpreter
+    from lexer import LexError
+    from naming import NameCollisionError
+    from source_loader import SourceLoadError, discover_source_units, compile_sources
+    from parser import ParseError, dump
 
 
 def run_file(path: str, entry: str = "MAIN", args=None, dump_ast: bool = False,
@@ -102,8 +108,19 @@ def main(argv=None):
             print("[ERRO] --args-json exige um array JSON", file=sys.stderr)
             return 2
 
-    run_file(path, entry=entry, args=entry_args, dump_ast=dump_ast,
-             name_profile=name_profile)
+    try:
+        run_file(path, entry=entry, args=entry_args, dump_ast=dump_ast,
+                 name_profile=name_profile)
+    except (
+        AdvPLRuntimeError,
+        LexError,
+        ParseError,
+        NameCollisionError,
+        SourceLoadError,
+        OSError,
+    ) as exc:
+        print_diagnostic(exc)
+        return 1
 
     return 0
 

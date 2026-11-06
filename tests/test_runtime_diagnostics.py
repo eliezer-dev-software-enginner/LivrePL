@@ -4,7 +4,8 @@ import unittest
 from pathlib import Path
 
 from interpreter import AdvPLRuntimeError, run_source
-from main import main
+from diagnostics import format_diagnostic
+from main import main, run_file
 
 
 class RuntimeDiagnosticsTests(unittest.TestCase):
@@ -77,12 +78,12 @@ class RuntimeDiagnosticsTests(unittest.TestCase):
             'Function Main()\nReturn {1 + 2, "Total: " + cValToChar(7), {10, 20}[2]}\n'
         ))
 
-    def test_cli_raises_original_ex13_error(self):
+    def test_run_file_raises_original_ex13_error(self):
         source_path = Path(__file__).parent / "fixtures" / "runtime_error.prw"
         with self.assertRaisesRegex(AdvPLRuntimeError, r"\[linha 3\].*cValToChar"):
-            main([str(source_path), "ex13"])
+            run_file(str(source_path), "ex13")
 
-    def test_script_displays_python_traceback_and_nonzero_exit(self):
+    def test_script_displays_clean_diagnostic_and_nonzero_exit(self):
         root = Path(__file__).resolve().parents[1]
         source_path = root / "tests" / "fixtures" / "runtime_error.prw"
         result = subprocess.run(
@@ -90,9 +91,16 @@ class RuntimeDiagnosticsTests(unittest.TestCase):
             capture_output=True, text=True, encoding="utf-8", errors="replace",
         )
         self.assertNotEqual(0, result.returncode)
-        self.assertIn("Traceback (most recent call last)", result.stderr)
+        self.assertNotIn("Traceback (most recent call last)", result.stderr)
         self.assertIn("AdvPLRuntimeError: [linha 3]", result.stderr)
-        self.assertNotIn("[ERRO]", result.stderr)
+
+    def test_runtime_diagnostic_is_red_when_color_is_enabled(self):
+        message = format_diagnostic(
+            AdvPLRuntimeError("Função de entrada 'soma' não encontrada"),
+            color=True,
+        )
+        self.assertTrue(message.startswith("\033[31;1mAdvPLRuntimeError:"))
+        self.assertTrue(message.endswith("\033[0m"))
 
 
 if __name__ == "__main__":

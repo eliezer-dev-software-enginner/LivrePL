@@ -171,3 +171,10 @@ Este arquivo registra todas as modificacoes realizadas no projeto. Este arquivo 
 - A CLI aceita `livrepl --run Fontes/Utils.prw Soma --arg 2`, alem da forma posicional historica sem `--run`.
 - `--run` e somente um alias de interface: o carregador continua resolvendo o caminho informado e dependencias `usePrw` a partir do fonte principal.
 - Um teste de processo executa um PRW criado em `Fontes/` com funcao posicional e argumento textual.
+
+## 2026-11-06 — Diagnosticos curtos e coloridos na CLI
+
+- Erros conhecidos de carregamento, lexer, parser, nomes e runtime sao capturados por `main()` e exibidos como `TipoDoErro: mensagem`, sem traceback Python.
+- A mensagem usa vermelho somente quando `stderr` e um terminal interativo e `NO_COLOR` nao esta definido, seguindo o comportamento do AdvPLab. Saidas capturadas ou redirecionadas permanecem texto puro.
+- `run_file()` preserva a excecao original para testes e consumidores Python; somente a fronteira da CLI converte a falha em diagnostico e codigo de saida 1.
+- Testes cobrem runtime propagado pela API, processo sem traceback e formatacao ANSI vermelha.

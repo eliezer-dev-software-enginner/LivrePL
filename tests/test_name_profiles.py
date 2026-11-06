@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 
 from interpreter import run_source
-from main import main
+from main import main, run_file
 from naming import NameCollisionError
 
 
@@ -10,7 +10,7 @@ class NameProfileTests(unittest.TestCase):
     def test_cli_raises_legacy_collision(self):
         source = Path(__file__).parent / "fixtures" / "name_collision.prw"
         with self.assertRaisesRegex(NameCollisionError, "colidem"):
-            main([str(source), "AtualizaCadastroCliente", "--name-profile", "legacy10"])
+            run_file(str(source), "AtualizaCadastroCliente", name_profile="legacy10")
 
     def test_modern_keeps_distinct_long_function_names(self):
         source = (

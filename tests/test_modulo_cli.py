@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from interpreter import AdvPLRuntimeError, run_source
-from main import main
+from main import main, run_file
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,12 +68,11 @@ class CliArgumentsTests(unittest.TestCase):
 
     def test_numeric_argument_to_val_raises_exception(self):
         with self.assertRaisesRegex(AdvPLRuntimeError, "Val: esperado argumento caractere"):
-            main([
+            run_file(
                 str(ROOT / "tests" / "fixtures" / "modulo.prw"),
                 "Ex5",
-                "--args-json",
-                "[5]",
-            ])
+                args=[5],
+            )
 
     def test_rejects_mixing_text_and_json_arguments(self):
         error = io.StringIO()

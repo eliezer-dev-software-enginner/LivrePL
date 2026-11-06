@@ -102,6 +102,10 @@ livrepl .\arquivo.prw MinhaFuncao --arg 5
 
 Caminhos relativos do fonte, inclusive em subdiretorios, e operacoes de arquivo AdvPL usam o diretorio atual do terminal. O comando nao muda para a pasta de instalacao. `--run` e um alias opcional compativel com o AdvPLab. A entrada padrao continua MAIN; para User Function informe seu nome.
 
+Erros conhecidos de leitura, sintaxe, nomes e execucao aparecem de forma curta em vermelho
+no terminal, sem traceback Python. Em saidas redirecionadas o texto nao recebe codigos ANSI;
+defina `NO_COLOR=1` para desativar cores explicitamente.
+
 ### Primeiro programa
 
 Depois de instalar, crie um arquivo `teste.prw` em uma pasta de sua escolha e salve:
